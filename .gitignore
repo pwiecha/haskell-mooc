@@ -2,3 +2,4 @@
 *.lock
 .stack-work
 score.json
+exercises/dist-newstyle/cache/config
