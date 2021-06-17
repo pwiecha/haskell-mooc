@@ -62,7 +62,7 @@ updateAt i x xs = take i xs ++ [x] ++ drop (i + 1) xs
 --   substring 0 4 "abcdefgh"  ==>  "abcd"
 
 substring :: Int -> Int -> String -> String
-substring i j s = todo
+substring i j s = drop i (take j s)
 
 ------------------------------------------------------------------------------
 -- Ex 5: check if a string is a palindrome. A palindrome is a string
@@ -77,7 +77,10 @@ substring i j s = todo
 --   isPalindrome "AB"       ==>  False
 
 isPalindrome :: String -> Bool
-isPalindrome str = todo
+-- isPalindrome str = if str == reverse str then True else False
+isPalindrome str
+    | str == reverse str = True
+    | otherwise = False
 
 ------------------------------------------------------------------------------
 -- Ex 6: implement the function palindromify that chops a character
@@ -91,7 +94,11 @@ isPalindrome str = todo
 --   palindromify "abracacabra" ==> "acaca"
 
 palindromify :: String -> String
-palindromify s = todo
+palindromify s
+    | isPalindrome s = s
+    | otherwise = palindromify (init (tail s))
+
+-- palindromify [] = [] -- not needed because [] == reverse [] = True
 
 ------------------------------------------------------------------------------
 -- Ex 7: implement safe integer division, that is, a function that
@@ -104,7 +111,8 @@ palindromify s = todo
 --   safeDiv 4 0  ==> Nothing
 
 safeDiv :: Integer -> Integer -> Maybe Integer
-safeDiv x y = todo
+safeDiv _ 0 = Nothing
+safeDiv x y = Just (div x y)
 
 ------------------------------------------------------------------------------
 -- Ex 8: implement a function greet that greets a person given a first
