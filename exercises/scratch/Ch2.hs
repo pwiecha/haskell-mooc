@@ -20,3 +20,8 @@ factorialGuards n
     | n < 0 = -1
     | n < 1 = 1
     | otherwise = n * factorialGuards (n-1)
+
+-- Just lists both a and b -> a and b are of the same type
+-- Just -> Maybe parameter type
+justBoth :: a -> a -> [Maybe a]
+justBoth a b = [Just a, Just b]
