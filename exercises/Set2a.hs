@@ -124,7 +124,8 @@ safeDiv x y = Just (div x y)
 --   greet "John" (Just "Smith")  ==> "Hello, John Smith!"
 
 greet :: String -> Maybe String -> String
-greet first last = todo
+greet first Nothing = "Hello, " ++ first  ++ "!"
+greet first (Just last) = "Hello, " ++ first ++ " " ++ last ++ "!"
 
 ------------------------------------------------------------------------------
 -- Ex 9: safe list indexing. Define a function safeIndex so that
@@ -139,8 +140,14 @@ greet first last = todo
 --   safeIndex [10,20,30] 3        ==> Nothing
 --   safeIndex ["a","b","c"] (-1)  ==> Nothing
 
+goodIndex :: Int -> Int -> Bool
+goodIndex llength idx = idx >= 0 && idx < llength
+
 safeIndex :: [a] -> Int -> Maybe a
-safeIndex xs i = todo
+safeIndex xs i =
+    case goodIndex (length xs) i of
+        True -> Just (xs !! i)
+        False -> Nothing
 
 ------------------------------------------------------------------------------
 -- Ex 10: another variant of safe division. This time you should use
@@ -151,7 +158,8 @@ safeIndex xs i = todo
 --   eitherDiv 4 0   ==> Left "4/0"
 
 eitherDiv :: Integer -> Integer -> Either String Integer
-eitherDiv x y = todo
+eitherDiv x 0 = Left (show x ++ "/0")
+eitherDiv x y = Right (div x y)
 
 ------------------------------------------------------------------------------
 -- Ex 11: implement the function addEithers, which combines two values of type
@@ -168,4 +176,7 @@ eitherDiv x y = todo
 --   addEithers (Left "boom") (Left "fail") ==> Left "boom"
 
 addEithers :: Either String Int -> Either String Int -> Either String Int
-addEithers a b = todo
+addEithers (Right a) (Right b) = Right (a + b)
+addEithers (Right a) (Left b) = Left b
+addEithers (Left a) (Right b) = Left a
+addEithers (Left a) (Left b) = Left a
