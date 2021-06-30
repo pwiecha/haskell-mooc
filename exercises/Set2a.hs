@@ -31,10 +31,14 @@ years = [1982, 2004, 2020]
 --
 -- Hint! remember the take and drop functions.
 
-takeFinal :: Int -> [a] -> [a]
+{--
 takeFinal n xs
     | n > length xs = xs
     | otherwise = drop (length xs - n) xs
+--}
+-- edit: drop takes care of n > length xs
+takeFinal :: Int -> [a] -> [a]
+takeFinal n xs = drop (length xs - n) xs
 
 ------------------------------------------------------------------------------
 -- Ex 3: Update an element at a certain index in a list. More
@@ -78,9 +82,12 @@ substring i j s = drop i (take j s)
 
 isPalindrome :: String -> Bool
 -- isPalindrome str = if str == reverse str then True else False
+{--
 isPalindrome str
     | str == reverse str = True
     | otherwise = False
+--}
+isPalindrome str = str == reverse str
 
 ------------------------------------------------------------------------------
 -- Ex 6: implement the function palindromify that chops a character
@@ -176,7 +183,12 @@ eitherDiv x y = Right (div x y)
 --   addEithers (Left "boom") (Left "fail") ==> Left "boom"
 
 addEithers :: Either String Int -> Either String Int -> Either String Int
+{--
 addEithers (Right a) (Right b) = Right (a + b)
 addEithers (Right a) (Left b) = Left b
 addEithers (Left a) (Right b) = Left a
 addEithers (Left a) (Left b) = Left a
+--}
+addEithers (Right a) (Right b) = Right (a + b)
+addEithers (Right a) (Left b) = Left b
+addEithers (Left a) _ = Left a
