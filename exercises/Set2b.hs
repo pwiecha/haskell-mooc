@@ -16,7 +16,9 @@ import Data.List
 -- Hint! pattern matching is your friend.
 
 binomial :: Integer -> Integer -> Integer
-binomial = todo
+binomial n 0 = 1
+binomial 0 k = 0
+binomial n k = binomial (n-1) k + binomial (n-1) (k-1)
 
 ------------------------------------------------------------------------------
 -- Ex 2: implement the odd factorial function. Odd factorial is like
@@ -25,9 +27,15 @@ binomial = todo
 -- Examples:
 --   oddFactorial 7 ==> 7*5*3*1 ==> 105
 --   oddFactorial 6 ==> 5*3*1 ==> 15
+oddFactorialHelper :: Integer -> Integer
+oddFactorialHelper n
+    | n > 1 = n * oddFactorial(n-2)
+    | otherwise = 1
 
 oddFactorial :: Integer -> Integer
-oddFactorial = todo
+oddFactorial n
+    | odd n = oddFactorialHelper(n)
+    | otherwise = oddFactorialHelper(n-1)
 
 ------------------------------------------------------------------------------
 -- Ex 3: implement the Euclidean Algorithm for finding the greatest
@@ -59,7 +67,11 @@ oddFactorial = todo
 -- * https://en.wikipedia.org/wiki/Euclidean_algorithm
 
 myGcd :: Integer -> Integer -> Integer
-myGcd = todo
+myGcd n k
+    | k == 0 = n
+    | n == 0 = k
+    | n >= k = myGcd (n-k) k
+    | n < k = myGcd n (k-n)
 
 ------------------------------------------------------------------------------
 -- Ex 4: Implement the function leftpad which adds space characters
@@ -75,7 +87,13 @@ myGcd = todo
 -- * you can compute the length of a string with the length function
 
 leftpad :: String -> Int -> String
-leftpad = todo
+leftpad str newlen
+    | newlen <= strlen = str
+    -- replicate:: a-> [a] ([[Char]]) -> concat:: [Char]
+    | otherwise = concat (replicate (newlen-strlen) space) ++ str
+    where
+        strlen = length(str)
+        space = " "
 
 ------------------------------------------------------------------------------
 -- Ex 5: let's make a countdown for a rocket! Given a number, you
