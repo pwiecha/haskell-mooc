@@ -29,13 +29,13 @@ binomial n k = binomial (n-1) k + binomial (n-1) (k-1)
 --   oddFactorial 6 ==> 5*3*1 ==> 15
 oddFactorialHelper :: Integer -> Integer
 oddFactorialHelper n
-    | n > 1 = n * oddFactorial(n-2)
+    | n > 1 = n * oddFactorial (n-2)
     | otherwise = 1
 
 oddFactorial :: Integer -> Integer
 oddFactorial n
-    | odd n = oddFactorialHelper(n)
-    | otherwise = oddFactorialHelper(n-1)
+    | odd n = oddFactorialHelper n
+    | otherwise = oddFactorialHelper (n-1)
 
 ------------------------------------------------------------------------------
 -- Ex 3: implement the Euclidean Algorithm for finding the greatest
@@ -92,7 +92,7 @@ leftpad str newlen
     -- replicate:: a-> [a] ([[Char]]) -> concat:: [Char]
     | otherwise = concat (replicate (newlen-strlen) space) ++ str
     where
-        strlen = length(str)
+        strlen = length str
         space = " "
 
 ------------------------------------------------------------------------------
@@ -108,8 +108,18 @@ leftpad str newlen
 -- * you can use the show function to convert a number into a string
 -- * you'll probably need a recursive helper function
 
+countdownHelper :: Integer -> String
+countdownHelper n
+    | n < 1 = ""
+    | otherwise = show n ++ separator ++ countdownHelper (n-1)
+    where
+        separator = "... "
+
 countdown :: Integer -> String
-countdown = todo
+countdown n = prefix ++ countdownHelper n ++ suffix
+    where
+        prefix = "Ready! "
+        suffix = "Liftoff!"
 
 ------------------------------------------------------------------------------
 -- Ex 6: implement the function smallestDivisor that returns the
@@ -126,8 +136,22 @@ countdown = todo
 --
 -- Hint: remember the mod function!
 
+-- check divisors from the list
+-- if list is exausted, return n (prime)
+smallestDivisorHelper :: Integer -> [Integer] -> Integer
+smallestDivisorHelper n [] = n
+smallestDivisorHelper n (x:xs)
+    | n `mod` x == 0 = x
+    | otherwise = smallestDivisorHelper n xs
+
+-- even check
+-- otherwise divisors of n can't be greater than sqrt(n)
+-- and n not even 
+-- check -> [3,5..sqrt n]
 smallestDivisor :: Integer -> Integer
-smallestDivisor = todo
+smallestDivisor n
+    | even n = 2
+    | otherwise = smallestDivisorHelper n [3,5..round (sqrt (fromIntegral n))]
 
 ------------------------------------------------------------------------------
 -- Ex 7: implement a function isPrime that checks if the given number
@@ -136,7 +160,7 @@ smallestDivisor = todo
 -- Ps. 0 and 1 are not prime numbers
 
 isPrime :: Integer -> Bool
-isPrime = todo
+isPrime n = not (n <= 1) && smallestDivisor n == n
 
 ------------------------------------------------------------------------------
 -- Ex 8: implement a function biggestPrimeAtMost that returns the
@@ -151,4 +175,6 @@ isPrime = todo
 --   biggestPrimeAtMost 10 ==> 7
 
 biggestPrimeAtMost :: Integer -> Integer
-biggestPrimeAtMost = todo
+biggestPrimeAtMost n
+    | n < 2 || isPrime n = n
+    | otherwise = biggestPrimeAtMost (n-1)
