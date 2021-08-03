@@ -66,12 +66,18 @@ oddFactorial n
 -- Background reading:
 -- * https://en.wikipedia.org/wiki/Euclidean_algorithm
 
+-- new ver based on wikipedia reading
 myGcd :: Integer -> Integer -> Integer
+myGcd n k
+    | k == 0 = n
+    | otherwise = myGcd k (n `mod` k)
+{-
 myGcd n k
     | k == 0 = n
     | n == 0 = k
     | n >= k = myGcd (n-k) k
     | n < k = myGcd n (k-n)
+-}
 
 ------------------------------------------------------------------------------
 -- Ex 4: Implement the function leftpad which adds space characters
@@ -108,19 +114,18 @@ leftpad str newlen
 -- * you can use the show function to convert a number into a string
 -- * you'll probably need a recursive helper function
 
-countdownHelper :: Integer -> String
-countdownHelper n
-    | n < 1 = ""
-    | otherwise = show n ++ separator ++ countdownHelper (n-1)
-    where
-        separator = "... "
-
 countdown :: Integer -> String
 countdown n = prefix ++ countdownHelper n ++ suffix
     where
         prefix = "Ready! "
         suffix = "Liftoff!"
 
+countdownHelper :: Integer -> String
+countdownHelper n
+    | n < 1 = ""
+    | otherwise = show n ++ separator ++ countdownHelper (n-1)
+    where
+        separator = "... "
 ------------------------------------------------------------------------------
 -- Ex 6: implement the function smallestDivisor that returns the
 -- smallest number (greater than 1) that divides the given number evenly.
@@ -136,14 +141,6 @@ countdown n = prefix ++ countdownHelper n ++ suffix
 --
 -- Hint: remember the mod function!
 
--- check divisors from the list
--- if list is exausted, return n (prime)
-smallestDivisorHelper :: Integer -> [Integer] -> Integer
-smallestDivisorHelper n [] = n
-smallestDivisorHelper n (x:xs)
-    | n `mod` x == 0 = x
-    | otherwise = smallestDivisorHelper n xs
-
 -- even check
 -- otherwise divisors of n can't be greater than sqrt(n)
 -- and n not even 
@@ -152,6 +149,15 @@ smallestDivisor :: Integer -> Integer
 smallestDivisor n
     | even n = 2
     | otherwise = smallestDivisorHelper n [3,5..round (sqrt (fromIntegral n))]
+
+-- check divisors from the list
+-- if list is exausted, return n (prime)
+smallestDivisorHelper :: Integer -> [Integer] -> Integer
+smallestDivisorHelper n [] = n
+smallestDivisorHelper n (x:xs)
+    | n `mod` x == 0 = x
+    | otherwise = smallestDivisorHelper n xs
+
 
 ------------------------------------------------------------------------------
 -- Ex 7: implement a function isPrime that checks if the given number
