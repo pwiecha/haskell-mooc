@@ -5,13 +5,13 @@
 
 module Set3a where
 
-import Mooc.Todo
+import           Mooc.Todo
 
 -- Some imports you'll need.
 -- Do not add any other imports! :)
-import Data.Char
-import Data.Either
-import Data.List
+import           Data.Char
+import           Data.Either
+import           Data.List
 
 ------------------------------------------------------------------------------
 -- Ex 1: implement the function maxBy that takes as argument a
@@ -42,7 +42,7 @@ maxBy measure a b
 --   mapMaybe length (Just "abc") ==> Just 3
 
 mapMaybe :: (a -> b) -> Maybe a -> Maybe b
-mapMaybe f Nothing = Nothing
+mapMaybe f Nothing  = Nothing
 mapMaybe f (Just x) = Just (f x)
 
 ------------------------------------------------------------------------------
@@ -57,8 +57,8 @@ mapMaybe f (Just x) = Just (f x)
 --   mapMaybe2 div (Just 6) Nothing   ==>  Nothing
 
 mapMaybe2 :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
-mapMaybe2 f Nothing _ = Nothing
-mapMaybe2 f _ Nothing = Nothing
+mapMaybe2 f Nothing _         = Nothing
+mapMaybe2 f _ Nothing         = Nothing
 mapMaybe2 f (Just x) (Just y) = Just (f x y)
 
 ------------------------------------------------------------------------------
@@ -85,9 +85,10 @@ palindromeHalfs xs = map firstHalf (filter palindrome xs)
 firstHalf :: String -> String
 firstHalf str = take half_len str
     where
+        len = length str
         half_len
-            | even (length str) = length str `div` 2
-            | otherwise = length str `div` 2 + 1
+            | even len = len `div` 2
+            | otherwise = len `div` 2 + 1
 
 palindrome:: String -> Bool
 palindrome str = str == reverse str
@@ -134,7 +135,14 @@ capitalizeFirst str = toUpper (head str) : tail str
 --   * the function takeWhile
 
 powers :: Int -> Int -> [Int]
-powers k max = todo
+-- create k to power [0..k] and take less than max
+-- powers k max = takeWhile (<=max) (map (k^) [0..max])
+-- here $ allows map to bind to its arguments
+-- powers k max = takeWhile (<=max) $ map (k^) [0..max]
+-- powers k max = takeWhile (<=max) . map (k^) $ [0..max]
+
+-- using iterate to avoid creating longer than needed list, k, k*k, k*k*k...
+powers k max = takeWhile (<=max) $ iterate (k*) 1
 
 ------------------------------------------------------------------------------
 -- Ex 7: implement a functional while loop. While should be a function
@@ -157,7 +165,9 @@ powers k max = todo
 --     ==> Avvt
 
 while :: (a->Bool) -> (a->a) -> a -> a
-while check update value = todo
+while check update value
+    | check value = while check update $ update value
+    | otherwise = value
 
 ------------------------------------------------------------------------------
 -- Ex 8: another version of a while loop. This time, the check
@@ -174,7 +184,10 @@ while check update value = todo
 --   whileRight (step 1000) 3  ==> 1536
 
 whileRight :: (a -> Either b a) -> a -> b
-whileRight f x = todo
+whileRight f x =
+  case f x of
+    Left x  -> x
+    Right x -> whileRight f x
 
 -- for the whileRight examples:
 -- step k x doubles x if it's less than k
@@ -193,7 +206,11 @@ step k x = if x<k then Right (2*x) else Left x
 -- Hint! This is a great use for list comprehensions
 
 joinToLength :: Int -> [String] -> [String]
-joinToLength = todo
+joinToLength strlen strlst =
+  [i ++ j
+  | i <- strlst, j <- strlst,
+  length (i ++ j) == strlen -- filter output
+  ]
 
 ------------------------------------------------------------------------------
 -- Ex 10: implement the operator +|+ that returns a list with the first
@@ -206,7 +223,17 @@ joinToLength = todo
 --   [1,2,3] +|+ [4,5,6]  ==> [1,4]
 --   [] +|+ [True]        ==> [True]
 --   [] +|+ []            ==> []
+{-
+-- from lecture
+(<+>) :: [Int] -> [Int] -> [Int]
+xs <+> ys = zipWith (+) xs ys
+-}
 
+(+|+) :: [a] -> [a] -> [a]
+[] +|+ [] = []
+[] +|+ ys = [head ys]
+xs +|+ [] = [head xs]
+xs +|+ ys = [head xs, head ys]
 
 ------------------------------------------------------------------------------
 -- Ex 11: remember the lectureParticipants example from Lecture 2? We
