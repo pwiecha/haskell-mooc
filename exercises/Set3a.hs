@@ -249,8 +249,9 @@ xs +|+ ys = [head xs, head ys]
 --   sumRights [Right 1, Left "bad value", Right 2]  ==>  3
 --   sumRights [Left "bad!", Left "missing"]         ==>  0
 
+-- sum(Left -> 0, Right x -> x)
 sumRights :: [Either a Int] -> Int
-sumRights = todo
+sumRights lst = sum . map (either (const 0) id) $ lst
 
 ------------------------------------------------------------------------------
 -- Ex 12: recall the binary function composition operation
@@ -266,7 +267,12 @@ sumRights = todo
 --   multiCompose [(3*), (2^), (+1)] 0 ==> 6
 --   multiCompose [(+1), (2^), (3*)] 0 ==> 2
 
-multiCompose fs = todo
+multiCompose fs x = mcf x
+  where mcf = foldr (.) id fs 
+  -- ^ id is the default function applied if no other were supplied (empty list)
+
+-- else take last function, apply it to argument and take next?
+-- (init fs) (last fs x)
 
 ------------------------------------------------------------------------------
 -- Ex 13: let's consider another way to compose multiple functions. Given
@@ -285,7 +291,9 @@ multiCompose fs = todo
 --   multiApp reverse [tail, take 2, reverse] "foo" ==> ["oof","fo","oo"]
 --   multiApp concat [take 3, reverse] "race" ==> "racecar"
 
-multiApp = todo
+-- apply each function in gs to x, then apply f to resulting list
+-- second $ because composition accepts only single argument functions
+multiApp f gs x = f . map ($x) $ gs
 
 ------------------------------------------------------------------------------
 -- Ex 14: in this exercise you get to implement an interpreter for a
@@ -320,4 +328,44 @@ multiApp = todo
 -- function, the surprise won't work.
 
 interpreter :: [String] -> [String]
-interpreter commands = todo
+interpreter [] = []
+interpreter commands = interpreterHelper commands 0 0
+
+interpreterHelper :: [String] -> Int -> Int -> [String]
+interpreterHelper [] x y = []
+interpreterHelper (command:commands) x y
+  | command == "up" = interpreterHelper commands x (y+1)
+  | command == "down" = interpreterHelper commands x (y-1)
+  | command == "left" = interpreterHelper commands (x-1) y
+  | command == "right" = interpreterHelper commands (x+1) y
+  | command == "printX" = show x : interpreterHelper commands x y
+  | otherwise = show y : interpreterHelper commands x y
+
+
+{-
+  interpret command : interpreter commands
+  where 
+    interpret command
+      | command == "up" = "(0, 1)"
+      | command == "down" = "(0, -1)"
+      | command == "left" = "(-1, 0)"
+      | command == "right" = "(1, 0)"
+      | command == "right" = "(1, 0)"
+      | otherwise = command
+-}
+
+
+
+{-
+  interpreterHelper :: [String] -> 
+  map interpret commands
+  where
+    interpret :: [String] -> Either (Int, Int) String
+    interpret command
+      | command == "up" = Left (0, 1)
+      | command == "down" = Left (0, -1)
+      | command == "left" = Left (-1, 0)
+      | command == "right" = Left (1, 0)
+      | command == "right" = Left (1, 0)
+      | otherwise = command
+-}
