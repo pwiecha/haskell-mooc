@@ -49,10 +49,16 @@ buildList start count end = start : buildList start (count-1) end
 -- Use recursion and the : operator to build the list.
 --
 -- Ps. you'll probably need a recursive helper function
-
 sums :: Int -> [Int]
-sums i = todo
+sums i = sums' i 1
 
+sums' :: Int -> Int -> [Int]
+sums' 0 _ = []
+sums' i j = sum1ToN j : sums' (i-1) (j+1)
+
+sum1ToN :: Int -> Int
+sum1ToN 0 = 0
+sum1ToN n = n + sum1ToN (n-1)
 ------------------------------------------------------------------------------
 -- Ex 3: define a function mylast that returns the last value of the
 -- given list. For an empty list, a provided default value is
@@ -65,7 +71,9 @@ sums i = todo
 --   mylast 0 [1,2,3] ==> 3
 
 mylast :: a -> [a] -> a
-mylast def xs = todo
+mylast def [] = def
+mylast _ (x:[]) = x
+mylast def (x:xs) = mylast def xs
 
 ------------------------------------------------------------------------------
 -- Ex 4: safe list indexing. Define a function indexDefault so that
@@ -83,7 +91,9 @@ mylast def xs = todo
 --   indexDefault ["a","b","c"] (-1) "d" ==> "d"
 
 indexDefault :: [a] -> Int -> a -> a
-indexDefault xs i def = todo
+indexDefault [] _ def = def -- list exausted
+indexDefault (x:xs) 0 _ = x -- index found
+indexDefault (x:xs) i def = indexDefault xs (i-1) def -- traverse list
 
 ------------------------------------------------------------------------------
 -- Ex 5: define a function that checks if the given list is in
@@ -92,7 +102,11 @@ indexDefault xs i def = todo
 -- Use pattern matching and recursion to iterate through the list.
 
 sorted :: [Int] -> Bool
-sorted xs = todo
+sorted = todo
+
+--sorted [] = True
+--sorted x:x':xs = 
+
 
 ------------------------------------------------------------------------------
 -- Ex 6: compute the partial sums of the given list like this:
