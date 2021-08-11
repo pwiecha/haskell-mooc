@@ -42,7 +42,7 @@ maxBy measure a b
 --   mapMaybe length (Just "abc") ==> Just 3
 
 mapMaybe :: (a -> b) -> Maybe a -> Maybe b
-mapMaybe f Nothing  = Nothing
+mapMaybe _ Nothing  = Nothing
 mapMaybe f (Just x) = Just (f x)
 
 ------------------------------------------------------------------------------
@@ -56,10 +56,16 @@ mapMaybe f (Just x) = Just (f x)
 --   mapMaybe2 div Nothing  (Just 3)  ==>  Nothing
 --   mapMaybe2 div (Just 6) Nothing   ==>  Nothing
 
+{-
 mapMaybe2 :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
 mapMaybe2 f Nothing _         = Nothing
 mapMaybe2 f _ Nothing         = Nothing
 mapMaybe2 f (Just x) (Just y) = Just (f x y)
+-}
+-- we only care about result when both Just values are supplied
+mapMaybe2 :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+mapMaybe2 f (Just x) (Just y) = Just (f x y)
+mapMaybe2 _ _ _ = Nothing
 
 ------------------------------------------------------------------------------
 -- Ex 4: define the functions firstHalf and palindrome so that
@@ -84,11 +90,16 @@ palindromeHalfs xs = map firstHalf (filter palindrome xs)
 
 firstHalf :: String -> String
 firstHalf str = take half_len str
+  where
+    half_len = (length str + 1) `div` 2 -- works for even and odd
+{-
+firstHalf str = take half_len str
     where
         len = length str
         half_len
             | even len = len `div` 2
             | otherwise = len `div` 2 + 1
+-}
 
 palindrome:: String -> Bool
 palindrome str = str == reverse str
@@ -119,6 +130,7 @@ capitalize str = unwords . map capitalizeFirst $ words str
 
 capitalizeFirst :: String -> String
 capitalizeFirst str = toUpper (head str) : tail str
+-- or capitalizeFirst (h:t) = toUpper h : t
 
 ------------------------------------------------------------------------------
 -- Ex 6: powers k max should return all the powers of k that are less
@@ -141,6 +153,7 @@ powers :: Int -> Int -> [Int]
 -- powers k max = takeWhile (<=max) $ map (k^) [0..max]
 -- powers k max = takeWhile (<=max) . map (k^) $ [0..max]
 
+-- > powers k max = takeWhile (<=max) $ map (k^) [0..max]
 -- using iterate to avoid creating longer than needed list, k, k*k, k*k*k...
 powers k max = takeWhile (<=max) $ iterate (k*) 1
 
@@ -211,6 +224,7 @@ joinToLength strlen strlst =
   | i <- strlst, j <- strlst,
   length (i ++ j) == strlen -- filter output
   ]
+-- or write filter as: let k = i ++ j, length k == strlen
 
 ------------------------------------------------------------------------------
 -- Ex 10: implement the operator +|+ that returns a list with the first
@@ -230,10 +244,14 @@ xs <+> ys = zipWith (+) xs ys
 -}
 
 (+|+) :: [a] -> [a] -> [a]
+{-
 [] +|+ [] = []
 [] +|+ ys = [head ys]
 xs +|+ [] = [head xs]
 xs +|+ ys = [head xs, head ys]
+-}
+-- take solves the list empty case
+xs +|+ ys = take 1 xs ++ take 1 ys
 
 ------------------------------------------------------------------------------
 -- Ex 11: remember the lectureParticipants example from Lecture 2? We
@@ -340,6 +358,7 @@ interpreterHelper (command:commands) x y
   | command == "right" = interpreterHelper commands (x+1) y
   | command == "printX" = show x : interpreterHelper commands x y
   | otherwise = show y : interpreterHelper commands x y
+-- or add case for printY and default to some "ERROR"
 
 
 {-
