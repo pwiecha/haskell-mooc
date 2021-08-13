@@ -102,10 +102,10 @@ indexDefault (x:xs) i def = indexDefault xs (i-1) def -- traverse list
 -- Use pattern matching and recursion to iterate through the list.
 
 sorted :: [Int] -> Bool
-sorted = todo
-
---sorted [] = True
---sorted x:x':xs = 
+-- sorted [] = True
+-- sorted (x:[]) = True
+sorted (x:x':xs) = x <= x' && sorted (x':xs)
+sorted _ = True -- covers empty and one element list
 
 
 ------------------------------------------------------------------------------
@@ -118,8 +118,13 @@ sorted = todo
 -- Use pattern matching and recursion (and the list constructors : and [])
 
 sumsOf :: [Int] -> [Int]
-sumsOf xs = todo
+sumsOf [] = []
+sumsOf (x:xs) = x : sumsOfHelper xs x
 
+sumsOfHelper :: [Int] -> Int -> [Int] -- rolling sum
+sumsOfHelper [] _ = [] -- list exausted
+sumsOfHelper (x:xs) rolling_sum = new_sum : sumsOfHelper xs new_sum
+  where new_sum = x + rolling_sum
 ------------------------------------------------------------------------------
 -- Ex 7: implement the function merge that merges two sorted lists of
 -- Ints into a sorted list
@@ -131,7 +136,11 @@ sumsOf xs = todo
 --   merge [1,1,6] [1,2]   ==> [1,1,1,2,6]
 
 merge :: [Int] -> [Int] -> [Int]
-merge xs ys = todo
+merge x [] = x
+merge [] y = y
+merge (x:xs) (y:ys) =
+  if x < y then x : merge xs (y:ys)
+  else y : merge (x:xs) ys
 
 ------------------------------------------------------------------------------
 -- Ex 8: define the function mymaximum that takes a list and a
@@ -150,7 +159,13 @@ merge xs ys = todo
 --     ==> [1,2]
 
 mymaximum :: (a -> a -> Bool) -> a -> [a] -> a
-mymaximum bigger initial xs = todo
+mymaximum _ initial [] = initial
+mymaximum bigger initial (x:xs) = mymaximum bigger (takeBigger bigger initial x) xs
+
+takeBigger :: (a -> a -> Bool) -> a -> a -> a
+takeBigger bigger x y
+  | bigger x y = x
+  | otherwise = y
 
 ------------------------------------------------------------------------------
 -- Ex 9: define a version of map that takes a two-argument function
