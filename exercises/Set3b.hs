@@ -39,7 +39,7 @@ import Mooc.Todo
 --   buildList 7 0 3 ==> [3]
 
 buildList :: Int -> Int -> Int -> [Int]
-buildList _ 0 end = end : []
+buildList _ 0 end = [end] -- end : []
 buildList start count end = start : buildList start (count-1) end
 
 
@@ -49,6 +49,14 @@ buildList start count end = start : buildList start (count-1) end
 -- Use recursion and the : operator to build the list.
 --
 -- Ps. you'll probably need a recursive helper function
+-- better because no need to sum1ToN
+sums :: Int -> [Int]
+sums i = sums' 0 1
+  where 
+    sums' sum j
+      | j > i = []
+      | otherwise = (sum+j) : sums' (sum+j) (j+1)
+{--
 sums :: Int -> [Int]
 sums i = sums' i 1
 
@@ -59,6 +67,7 @@ sums' i j = sum1ToN j : sums' (i-1) (j+1)
 sum1ToN :: Int -> Int
 sum1ToN 0 = 0
 sum1ToN n = n + sum1ToN (n-1)
+--}
 ------------------------------------------------------------------------------
 -- Ex 3: define a function mylast that returns the last value of the
 -- given list. For an empty list, a provided default value is
@@ -72,8 +81,10 @@ sum1ToN n = n + sum1ToN (n-1)
 
 mylast :: a -> [a] -> a
 mylast def [] = def
-mylast _ (x:[]) = x
-mylast def (x:xs) = mylast def xs
+-- mylast _ (x:[]) = x
+-- mylast def (x:xs) = mylast def xs
+-- can be boiled down to
+mylast _ (x:xs) = mylast x xs
 
 ------------------------------------------------------------------------------
 -- Ex 4: safe list indexing. Define a function indexDefault so that
@@ -161,6 +172,7 @@ merge (x:xs) (y:ys) =
 mymaximum :: (a -> a -> Bool) -> a -> [a] -> a
 mymaximum _ initial [] = initial
 mymaximum bigger initial (x:xs) = mymaximum bigger (takeBigger bigger initial x) xs
+-- or use guards and check if bigger x initial is True -> change initial to x
 
 takeBigger :: (a -> a -> Bool) -> a -> a -> a
 takeBigger bigger x y
@@ -179,9 +191,8 @@ takeBigger bigger x y
 -- Use recursion and pattern matching. Do not use any library functions.
 
 map2 :: (a -> b -> c) -> [a] -> [b] -> [c]
-map2 f [] _ = []
-map2 f _ [] = []
 map2 f (a:as) (b:bs) = f a b : map2 f as bs
+map2 f _ _ = []
 
 ------------------------------------------------------------------------------
 -- Ex 10: implement the function maybeMap, which works a bit like a
