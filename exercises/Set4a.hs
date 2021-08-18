@@ -34,8 +34,10 @@ import Data.Array
 -- PS. check out the error message you get with your implementation if
 -- you remove the Eq a => constraint from the type!
 
+-- allEqual :: [a] -> Bool
 allEqual :: Eq a => [a] -> Bool
-allEqual xs = todo
+allEqual (x:x':xs) = x == x' && allEqual (x':xs)
+allEqual _ = True
 
 ------------------------------------------------------------------------------
 -- Ex 2: implement the function distinct which returns True if all
@@ -50,7 +52,7 @@ allEqual xs = todo
 --   distinct [1,2] ==> True
 
 distinct :: Eq a => [a] -> Bool
-distinct = todo
+distinct l = l == nub l
 
 ------------------------------------------------------------------------------
 -- Ex 3: implement the function middle that returns the middle value
@@ -63,7 +65,8 @@ distinct = todo
 --   middle 'b' 'a' 'c'  ==> 'b'
 --   middle 1 7 3        ==> 3
 
-middle = todo
+middle :: Ord a => a -> a -> a -> a
+middle a b c = sort [a, b, c] !! 1
 
 ------------------------------------------------------------------------------
 -- Ex 4: return the range of an input list, that is, the difference
@@ -78,8 +81,8 @@ middle = todo
 --   rangeOf [4,2,1,3]          ==> 3
 --   rangeOf [1.5,1.0,1.1,1.2]  ==> 0.5
 
-rangeOf :: [a] -> a
-rangeOf = todo
+rangeOf :: (Ord a, Num a) => [a] -> a
+rangeOf l = maximum l - minimum l
 
 ------------------------------------------------------------------------------
 -- Ex 5: given a (non-empty) list of (non-empty) lists, return the longest
@@ -97,8 +100,13 @@ rangeOf = todo
 --   longest [[1,2,3],[4,5],[6]] ==> [1,2,3]
 --   longest ["bcd","def","ab"] ==> "bcd"
 
-longest = todo
-
+longest :: Ord a => [[a]] -> [a]
+longest (x:xs) = longest' x xs
+  where longest' init [] = init
+        longest' init (x:xs)
+          | length init < length x = longest' x xs
+          | length init == length x = longest' (min init x) xs
+          | otherwise = longest' init xs
 ------------------------------------------------------------------------------
 -- Ex 6: Implement the function incrementKey, that takes a list of
 -- (key,value) pairs, and adds 1 to all the values that have the given key.
@@ -113,8 +121,11 @@ longest = todo
 --   incrementKey True [(True,1),(False,3),(True,4)] ==> [(True,2),(False,3),(True,5)]
 --   incrementKey 'a' [('a',3.4)] ==> [('a',4.4)]
 
-incrementKey :: k -> [(k,v)] -> [(k,v)]
-incrementKey = todo
+incrementKey :: (Eq k, Num v) => k -> [(k,v)] -> [(k,v)]
+incrementKey _ [] = []
+incrementKey k (d:dict)
+  | k == fst d = (k, snd d + 1) : incrementKey k dict -- increment
+  | otherwise = d : incrementKey k dict -- pass
 
 ------------------------------------------------------------------------------
 -- Ex 7: compute the average of a list of values of the Fractional
