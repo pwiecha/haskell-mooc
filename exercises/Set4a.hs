@@ -36,8 +36,8 @@ import Data.Array
 
 -- allEqual :: [a] -> Bool
 allEqual :: Eq a => [a] -> Bool
-allEqual (x:x':xs) = x == x' && allEqual (x':xs)
-allEqual _ = True
+allEqual (x:x':xs) = x == x' && allEqual (x':xs) -- lists of len >= 2
+allEqual _ = True -- [] and lists of len 1
 
 ------------------------------------------------------------------------------
 -- Ex 2: implement the function distinct which returns True if all
@@ -140,7 +140,7 @@ incrementKey k (d:dict)
 -- length to a Fractional
 
 average :: Fractional a => [a] -> a
-average xs = todo
+average xs = foldr (+) 0 xs / fromIntegral (length xs)
 
 ------------------------------------------------------------------------------
 -- Ex 8: given a map from player name to score and two players, return
@@ -159,7 +159,11 @@ average xs = todo
 --     ==> "Lisa"
 
 winner :: Map.Map String Int -> String -> String -> String
-winner scores player1 player2 = todo
+winner scores player1 player2
+  | player2Score > player1Score = player2
+  | otherwise = player1
+    where player1Score = Map.findWithDefault 0 player1 scores
+          player2Score = Map.findWithDefault 0 player2 scores
 
 ------------------------------------------------------------------------------
 -- Ex 9: compute how many times each value in the list occurs. Return
@@ -174,7 +178,18 @@ winner scores player1 player2 = todo
 --     ==> Map.fromList [(False,3),(True,1)]
 
 freqs :: (Eq a, Ord a) => [a] -> Map.Map a Int
-freqs xs = todo
+freqs = Map.fromList . freqsLst
+
+countItem :: Eq a => a -> [a] -> Int
+countItem i = length . filter (== i)
+
+set :: Eq a => [a] -> [a]
+set [] = []
+set (x:xs) = x : filter (/= x) (set xs)
+-- or foldr (\x xs -> x : filter (/= x) xs [])
+
+freqsLst :: (Eq a) => [a] -> [(a, Int)]
+freqsLst ks = [(k, countItem k ks) | k <- set ks]
 
 ------------------------------------------------------------------------------
 -- Ex 10: recall the withdraw example from the course material. Write a
@@ -194,7 +209,7 @@ freqs xs = todo
 --   let bank = Map.fromList [("Bob",100),("Mike",50)]
 --   transfer "Bob" "Mike" 20 bank
 --     ==> fromList [("Bob",80),("Mike",70)]
---   transfer "Bob" "Mike" 120 bank
+--   let bank = Map.fromList [("Bob",100),("Mike",50)]
 --     ==> fromList [("Bob",100),("Mike",50)]
 --   transfer "Bob" "Lisa" 20 bank
 --     ==> fromList [("Bob",100),("Mike",50)]
@@ -202,8 +217,14 @@ freqs xs = todo
 --     ==> fromList [("Bob",100),("Mike",50)]
 
 transfer :: String -> String -> Int -> Map.Map String Int -> Map.Map String Int
-transfer from to amount bank = todo
-
+transfer from to amount bank
+  | Map.member from bank && Map.member to bank =
+    case Map.lookup from bank of
+      Nothing -> bank
+      Just balance ->
+        if amount <= balance && amount > 0 then Map.adjust (+amount) to (Map.adjust (subtract amount) from bank)
+        else bank
+  | otherwise = bank
 ------------------------------------------------------------------------------
 -- Ex 11: given an Array and two indices, swap the elements in the indices.
 --
@@ -212,7 +233,7 @@ transfer from to amount bank = todo
 --         ==> array (1,4) [(1,"one"),(2,"three"),(3,"two"),(4,"four")]
 
 swap :: Ix i => i -> i -> Array i a -> Array i a
-swap i j arr = todo
+swap i j arr = arr // [(i, arr ! j), (j, arr ! i)]
 
 ------------------------------------------------------------------------------
 -- Ex 12: given an Array, find the index of the largest element. You
@@ -223,4 +244,12 @@ swap i j arr = todo
 -- Hint: check out Data.Array.indices or Data.Array.assocs
 
 maxIndex :: (Ix i, Ord a) => Array i a -> i
-maxIndex = todo
+maxIndex arr = findLargest (head lst) (tail lst)
+  where lst = assocs arr
+
+findLargest :: (Ix i, Ord a) => (i, a) -> [(i, a)] -> i
+findLargest (bi, _) [] = bi
+findLargest (bi, bv) ((i,v):xs)
+  | bv > v = findLargest (bi, bv) xs
+  | otherwise = findLargest (i, v) xs
+
