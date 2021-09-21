@@ -143,4 +143,3 @@ myLast xs = foldr lastHelper Nothing xs
 lastHelper :: a -> Maybe a -> Maybe a
 lastHelper currItem Nothing = Just currItem -- get item once
 lastHelper _ prevItem = prevItem -- do nothing
-

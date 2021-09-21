@@ -36,8 +36,13 @@ import Data.Array
 
 -- allEqual :: [a] -> Bool
 allEqual :: Eq a => [a] -> Bool
+{--
 allEqual (x:x':xs) = x == x' && allEqual (x':xs) -- lists of len >= 2
 allEqual _ = True -- [] and lists of len 1
+--}
+-- more concise
+allEqual [] = True
+allEqual (x:xs) = all (==x) xs
 
 ------------------------------------------------------------------------------
 -- Ex 2: implement the function distinct which returns True if all
@@ -126,6 +131,7 @@ incrementKey _ [] = []
 incrementKey k (d:dict)
   | k == fst d = (k, snd d + 1) : incrementKey k dict -- increment
   | otherwise = d : incrementKey k dict -- pass
+-- map incr function also possible
 
 ------------------------------------------------------------------------------
 -- Ex 7: compute the average of a list of values of the Fractional
@@ -141,7 +147,7 @@ incrementKey k (d:dict)
 
 average :: Fractional a => [a] -> a
 average xs = foldr (+) 0 xs / fromIntegral (length xs)
-
+-- or sum instead of fold : )
 ------------------------------------------------------------------------------
 -- Ex 8: given a map from player name to score and two players, return
 -- the name of the player with more points. If the players are tied,
@@ -160,11 +166,15 @@ average xs = foldr (+) 0 xs / fromIntegral (length xs)
 
 winner :: Map.Map String Int -> String -> String -> String
 winner scores player1 player2
-  | player2Score > player1Score = player2
+  | getScore player2 > getScore player1 = player2
   | otherwise = player1
+    where getScore :: String -> Int
+          getScore player = Map.findWithDefault 0 player scores
+  {--
     where player1Score = Map.findWithDefault 0 player1 scores
           player2Score = Map.findWithDefault 0 player2 scores
-
+  --}
+-- or add function score player to boil down where to 1 line
 ------------------------------------------------------------------------------
 -- Ex 9: compute how many times each value in the list occurs. Return
 -- the frequencies as a Map from value to Int.
@@ -222,7 +232,8 @@ transfer from to amount bank
     case Map.lookup from bank of
       Nothing -> bank
       Just balance ->
-        if amount <= balance && amount > 0 then Map.adjust (+amount) to (Map.adjust (subtract amount) from bank)
+        if amount <= balance && amount > 0
+        then Map.adjust (+amount) to (Map.adjust (subtract amount) from bank)
         else bank
   | otherwise = bank
 ------------------------------------------------------------------------------
@@ -252,4 +263,3 @@ findLargest (bi, _) [] = bi
 findLargest (bi, bv) ((i,v):xs)
   | bv > v = findLargest (bi, bv) xs
   | otherwise = findLargest (i, v) xs
-
