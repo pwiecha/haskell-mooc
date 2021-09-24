@@ -12,14 +12,14 @@ import Mooc.Todo
 -- Bus, Tram and Train.
 --
 -- The constructors don't need any fields.
-
+data Vehicle = Bike | Bus | Tram | Train
 
 ------------------------------------------------------------------------------
 -- Ex 2: Define the type BusTicket that can represent values like these:
 --  - SingleTicket
 --  - MonthlyTicket "January"
 --  - MonthlyTicket "December"
-
+data BusTicket = MonthlyTicket String | SingleTicket
 
 ------------------------------------------------------------------------------
 -- Ex 3: Here's the definition for a datatype ShoppingEntry that
@@ -48,7 +48,7 @@ twoBananas = MkShoppingEntry "Banana" 1.1 2
 --   totalPrice twoBananas   ==> 2.2
 
 totalPrice :: ShoppingEntry -> Double
-totalPrice = todo
+totalPrice (MkShoppingEntry _ price quantity) = price * fromIntegral quantity
 
 -- buyOneMore should increment the count in an entry by one
 --
@@ -56,7 +56,7 @@ totalPrice = todo
 --   buyOneMore twoBananas    ==> MkShoppingEntry "Banana" 1.1 3
 
 buyOneMore :: ShoppingEntry -> ShoppingEntry
-buyOneMore = todo
+buyOneMore (MkShoppingEntry name price quantity) = MkShoppingEntry name price (quantity+1)
 
 ------------------------------------------------------------------------------
 -- Ex 4: define a datatype Person, which should contain the age (an
@@ -65,28 +65,29 @@ buyOneMore = todo
 -- Also define a Person value fred, and the functions getAge, getName,
 -- setAge and setName (see below).
 
-data Person = PersonUndefined
+data Person = CreatePerson  {age :: Int, name :: String}
   deriving Show
 
 -- fred is a person whose name is Fred and age is 90
 fred :: Person
-fred = todo
+fred = CreatePerson {name = "Fred", age = 90}
+-- ^ note: order doesn't matter since field are named now
 
 -- getName returns the name of the person
 getName :: Person -> String
-getName p = todo
+getName p = name p
 
 -- getAge returns the age of the person
 getAge :: Person -> Int
-getAge p = todo
+getAge p = age p
 
 -- setName takes a person and returns a new person with the name changed
 setName :: String -> Person -> Person
-setName name p = todo
+setName name p = CreatePerson {name=name, age=getAge p}
 
 -- setAge does likewise for age
 setAge :: Int -> Person -> Person
-setAge age p = todo
+setAge age p = CreatePerson {name=getName p, age=age}
 
 ------------------------------------------------------------------------------
 -- Ex 5: define a datatype Position which contains two Int values, x
@@ -96,27 +97,27 @@ setAge age p = todo
 --   getY (up (up origin))    ==> 2
 --   getX (up (right origin)) ==> 1
 
-data Position = PositionUndefined
+data Position = CreatePosition Int Int
 
 -- origin is a Position value with x and y set to 0
 origin :: Position
-origin = todo
+origin = CreatePosition 0 0
 
 -- getX returns the x of a Position
 getX :: Position -> Int
-getX = todo
+getX (CreatePosition x _) = x
 
 -- getY returns the y of a position
 getY :: Position -> Int
-getY = todo
+getY (CreatePosition _ y) = y
 
 -- up increases the y value of a position by one
 up :: Position -> Position
-up = todo
+up pos = CreatePosition (getX pos) (getY pos + 1)
 
 -- right increases the x value of a position by one
 right :: Position -> Position
-right = todo
+right pos = CreatePosition (getX pos + 1) (getY pos)
 
 ------------------------------------------------------------------------------
 -- Ex 6: Here's a datatype that represents a student. A student can
@@ -131,7 +132,12 @@ data Student = Freshman | NthYear Int | Graduated
 -- graduated student stays graduated even if he studies.
 
 study :: Student -> Student
-study = todo
+study Freshman = NthYear 1
+study (NthYear year)
+  | year < 7 = NthYear (year+1)
+  | otherwise = Graduated
+study Graduated = Graduated
+
 
 ------------------------------------------------------------------------------
 -- Ex 7: define a datatype UpDown that represents a counter that can
