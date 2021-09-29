@@ -7,6 +7,8 @@ module Set5a where
 
 import Mooc.Todo
 
+import Data.Maybe
+
 ------------------------------------------------------------------------------
 -- Ex 1: Define the type Vehicle that has four constructors: Bike,
 -- Bus, Tram and Train.
@@ -156,25 +158,27 @@ study Graduated = Graduated
 -- get (tick (tick (toggle (tick zero))))
 --   ==> -1
 
-data UpDown = UpDownUndefined1 | UpDownUndefined2
+data UpDown = UpCounter {value :: Int} | DownCounter {value :: Int}
 
 -- zero is an increasing counter with value 0
 zero :: UpDown
-zero = todo
+zero = UpCounter {value = 0}
 
 -- get returns the counter value
 get :: UpDown -> Int
-get ud = todo
+get ud = value ud
 
 -- tick increases an increasing counter by one or decreases a
 -- decreasing counter by one
 tick :: UpDown -> UpDown
-tick ud = todo
+tick (UpCounter val) = UpCounter (val+1)
+tick (DownCounter val) = DownCounter (val-1)
 
 -- toggle changes an increasing counter into a decreasing counter and
 -- vice versa
 toggle :: UpDown -> UpDown
-toggle ud = todo
+toggle (UpCounter val) = DownCounter val
+toggle (DownCounter val) = UpCounter val
 
 ------------------------------------------------------------------------------
 -- Ex 8: you'll find a Color datatype below. It has the three basic
@@ -204,7 +208,17 @@ data Color = Red | Green | Blue | Mix Color Color | Invert Color
   deriving Show
 
 rgb :: Color -> [Double]
-rgb col = todo
+rgb Red = [1,0,0]
+rgb Green = [0,1,0]
+rgb Blue = [0,0,1]
+rgb (Invert col) = map (1-) (rgb col)
+rgb (Mix colOne colTwo) = zipWith avg (rgb colOne) (rgb colTwo)
+  where avg a b = (a+b)/2
+{--
+rgb (Invert col) = [1-r, 1-g, 1-b]
+  where [r, g, b] = rgb col <== inferred
+--}
+
 
 ------------------------------------------------------------------------------
 -- Ex 9: define a parameterized datatype OneOrTwo that contains one or
@@ -213,6 +227,8 @@ rgb col = todo
 -- Examples:
 --   One True         ::  OneOrTwo Bool
 --   Two "cat" "dog"  ::  OneOrTwo String
+
+data OneOrTwo a = One a | Two a a
 
 
 ------------------------------------------------------------------------------
@@ -234,14 +250,16 @@ rgb col = todo
 -- Also define the functions toList and fromList that convert between
 -- KeyVals and lists of pairs.
 
-data KeyVals k v = KeyValsUndefined
+data KeyVals k v = Pair k v (KeyVals k v) | Empty
   deriving Show
 
 toList :: KeyVals k v -> [(k,v)]
-toList = todo
+toList Empty = []
+toList (Pair k v restOfKeyVals) = (k,v) : toList restOfKeyVals
 
 fromList :: [(k,v)] -> KeyVals k v
-fromList = todo
+fromList [] = Empty
+fromList ((k,v):kvs) = Pair k v (fromList kvs)
 
 ------------------------------------------------------------------------------
 -- Ex 11: The data type Nat is the so called Peano
@@ -258,10 +276,20 @@ data Nat = Zero | PlusOne Nat
   deriving (Show,Eq)
 
 fromNat :: Nat -> Int
-fromNat n = todo
+fromNat Zero = 0
+fromNat (PlusOne n) = 1 + fromNat n
 
 toNat :: Int -> Maybe Nat
-toNat z = todo
+toNat z
+  | z < 0 = Nothing
+  | z == 0 = Just Zero
+  | otherwise = Just $ PlusOne $ fromJust $ toNat (z-1) -- replaced w/ fromJust
+
+-- constrained to Nat on purpose
+maybeToNat :: Maybe Nat -> Nat
+maybeToNat (Just x) = x
+maybeToNat _ = error "not a Just type"
+
 
 ------------------------------------------------------------------------------
 -- Ex 12: While pleasingly simple in its definition, the Nat datatype is not
@@ -321,10 +349,20 @@ inc (O b) = I b
 inc (I b) = O (inc b)
 
 prettyPrint :: Bin -> String
-prettyPrint = todo
+prettyPrint End = ""
+prettyPrint (O b) = prettyPrint b ++ "0"
+prettyPrint (I b) = prettyPrint b ++ "1"
 
 fromBin :: Bin -> Int
-fromBin = todo
+fromBin End = 0
+fromBin (I b) = 1 + 2*(fromBin b)
+fromBin (O b) = 0 + 2*(fromBin b)
 
 toBin :: Int -> Bin
-toBin = todo
+toBin 0 = O End
+toBin 1 = I End
+toBin num =
+  case num `mod` 2 of
+    1 -> I $ toBin numDiv2
+    0 -> O $ toBin numDiv2
+    where numDiv2 = num `div` 2
