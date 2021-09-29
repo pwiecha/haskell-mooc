@@ -279,6 +279,16 @@ fromNat :: Nat -> Int
 fromNat Zero = 0
 fromNat (PlusOne n) = 1 + fromNat n
 
+-- "better" implementation of toNat
+toNat :: Int -> Maybe Nat
+toNat z
+  | z < 0 = Nothing
+  | otherwise = Just $ convert z
+  where
+    convert 0 = Zero
+    convert n = PlusOne . convert $ n-1
+
+{--
 toNat :: Int -> Maybe Nat
 toNat z
   | z < 0 = Nothing
@@ -289,6 +299,7 @@ toNat z
 maybeToNat :: Maybe Nat -> Nat
 maybeToNat (Just x) = x
 maybeToNat _ = error "not a Just type"
+--}
 
 
 ------------------------------------------------------------------------------
@@ -355,8 +366,8 @@ prettyPrint (I b) = prettyPrint b ++ "1"
 
 fromBin :: Bin -> Int
 fromBin End = 0
-fromBin (I b) = 1 + 2*(fromBin b)
-fromBin (O b) = 0 + 2*(fromBin b)
+fromBin (I b) = 2 * fromBin b + 1
+fromBin (O b) = 2 * fromBin b -- func takes precedence
 
 toBin :: Int -> Bin
 toBin 0 = O End
@@ -366,3 +377,15 @@ toBin num =
     1 -> I $ toBin numDiv2
     0 -> O $ toBin numDiv2
     where numDiv2 = num `div` 2
+
+-- or convert num to list of bits and fold w/ helper
+-- from solution:
+-- bits :: Int -> [Int]
+-- bits 0 = [0]
+-- bits 1 = [1]
+-- bits n = n `mod` 2 : bits (n `div` 2)
+--
+-- toBin :: Int -> Bin
+-- toBin n = foldr helper End (bits n)
+--   where helper 0 = O
+--         helper _ = I
