@@ -192,9 +192,12 @@ while check update value
 -- a Right, the function should call `check` on the contents of the
 -- Right and so on.
 --
--- Examples (see definition of step below):
+-- Examples (see definitions of step and bomb below):
 --   whileRight (step 100) 1   ==> 128
 --   whileRight (step 1000) 3  ==> 1536
+--   whileRight bomb 7         ==> "BOOM"
+--
+-- Hint! Remember the case-of expression from lecture 2.
 
 whileRight :: (a -> Either b a) -> a -> b
 whileRight f x =
@@ -206,6 +209,11 @@ whileRight f x =
 -- step k x doubles x if it's less than k
 step :: Int -> Int -> Either Int Int
 step k x = if x<k then Right (2*x) else Left x
+
+-- bomb x implements a countdown: it returns x-1 or "BOOM" if x was 0
+bomb :: Int -> Either String Int
+bomb 0 = Left "BOOM"
+bomb x = Right (x-1)
 
 ------------------------------------------------------------------------------
 -- Ex 9: given a list of strings and a length, return all strings that
@@ -308,6 +316,8 @@ multiCompose fs x = mcf x
 --   multiApp sum [(1+), (^3), (+2)] 1  ==>  6
 --   multiApp reverse [tail, take 2, reverse] "foo" ==> ["oof","fo","oo"]
 --   multiApp concat [take 3, reverse] "race" ==> "racecar"
+--   multiApp id [head, (!!2), last] "axbxc" ==> ['a','b','c'] i.e. "abc"
+--   multiApp sum [head, (!!2), last] [1,9,2,9,3] ==> 6
 
 -- apply each function in gs to x, then apply f to resulting list
 -- second $ because composition accepts only single argument functions
