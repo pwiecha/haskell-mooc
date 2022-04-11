@@ -25,7 +25,12 @@ tests = [ (1, "warmup",         [ ex1_nextRow, ex1_nextCol ])
         , (6, "fixFirst",       [ ex6_fixFirst_safeZone, ex6_fixFirst_dangerZone, ex6_fixFirst_outside ])
         , (7, "stackOps",       [ ex7_continue, ex7_backtrack ])
         , (8, "nqueens_step",   [ ex8_step_4, ex8_step_continue, ex8_step_backtrack ])
-        , (9, "nqueens_finish", [ ex9_finish_small, ex9_finish_medium, ex9_finish_large ])
+        , (9, "nqueens_finish", [ ex9_finish_small, ex9_finish_medium,
+                                  ex9_finish_large_9,
+                                  ex9_finish_large_10,
+                                  ex9_finish_large_11,
+                                  ex9_finish_large_12,
+                                  ex9_finish_large_13])
         ]
 
 -- -- -- -- --
@@ -181,26 +186,30 @@ ex3_sameDiag_pos = property $ do
   let xs = [(i + k, j + k) | k <- [0..9]]
   x <- elements xs
   y <- elements xs
-  return $ $(testing [| sameDiag x y |]) (?== True)
+  return $ conjoin [$(testing [| sameDiag x y |]) (?== True)
+                   ,$(testing [| sameDiag y x |]) (?== True)]
 
 ex3_sameDiag_neg = property $ do
   (i,j) <- coord
-  let xs = [(i, j + k) | k <- [1..10]]
+  let xs = [(i + k', j + k) | k <- [1..10], k' <- [-5..5], k/=k']
   x <- elements xs
-  return $ $(testing [| sameDiag (i,j) x |]) (?== False)
+  return $ conjoin [$(testing [| sameDiag (i,j) x |]) (?== False)
+                   ,$(testing [| sameDiag x (i,j) |]) (?== False)]
 
 ex3_sameAntidiag_pos = property $ do
   (i,j) <- coord
   let xs = [ (i - k, j + k) | k <- [0..min i 10] ]
   x <- elements xs
   y <- elements xs
-  return $ $(testing [| sameAntidiag x y |]) (?== True)
+  return $ conjoin [$(testing [| sameAntidiag x y |]) (?== True)
+                   ,$(testing [| sameAntidiag y x |]) (?== True)]
 
 ex3_sameAntidiag_neg = property $ do
   (i,j) <- coord
-  let xs = [(i, j + k) | k <- [1..10]]
+  let xs = [(i - k', j + k) | k <- [1..10], k' <- [-5..5], k/=k']
   x <- elements xs
-  return $ $(testing [| sameAntidiag (i,j) x |]) (?== False)
+  return $ conjoin [$(testing [| sameAntidiag (i,j) x |]) (?== False)
+                   ,$(testing [| sameAntidiag x (i,j) |]) (?== False)]
 
 --------------------------------------------------------------------------------
 
@@ -445,4 +454,10 @@ m_finish_n n = $(testing [|finish n [(1,1)]|]) . was $ \qs ->
           ]
 
 ex9_finish_medium = forAllBlind (choose (5,8)) m_finish_n
-ex9_finish_large = forAllBlind (choose (9,13)) m_finish_n
+
+-- separate tests for nicer time limit handling
+ex9_finish_large_9 = once $ m_finish_n 9
+ex9_finish_large_10 = once $ m_finish_n 10
+ex9_finish_large_11 = once $ m_finish_n 11
+ex9_finish_large_12 = once $ m_finish_n 12
+ex9_finish_large_13 = once $ m_finish_n 13
