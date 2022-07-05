@@ -157,7 +157,9 @@ cull val (Node v lTree rTree)
 --                     (Node 3 Empty Empty))   ==>   True
 
 isOrdered :: Ord a => Tree a -> Bool
-isOrdered = todo
+isOrdered tree = case tree of
+  Empty -> True
+  Node val lTree rTree -> allValues (<val) lTree && allValues (>val) rTree && isOrdered lTree && isOrdered rTree
 
 ------------------------------------------------------------------------------
 -- Ex 8: a path in a tree can be represented as a list of steps that
@@ -176,7 +178,11 @@ data Step = StepL | StepR
 --   walk [StepL,StepL] (Node 1 (Node 2 Empty Empty) Empty)  ==>  Nothing
 
 walk :: [Step] -> Tree a -> Maybe a
-walk = todo
+walk [] (Node val _ _) = Just val
+walk (step:steps) (Node _ lTree rTree) = case step of
+  StepL -> walk steps lTree
+  StepR -> walk steps rTree
+walk _ _ = Nothing
 
 ------------------------------------------------------------------------------
 -- Ex 9: given a tree, a path and a value, set the value at the end of
@@ -197,7 +203,10 @@ walk = todo
 --   set [StepL,StepR] 1 (Node 0 Empty Empty)  ==>  (Node 0 Empty Empty)
 
 set :: [Step] -> a -> Tree a -> Tree a
-set path val tree = todo
+set [] val (Node _ lTree rTree) = Node val lTree rTree
+set (StepL:steps) val (Node val' lTree rTree) = Node val' (set steps val lTree) rTree
+set (StepR:steps) val (Node val' lTree rTree) = Node val' lTree (set steps val rTree)
+set _ _ tree = tree
 
 ------------------------------------------------------------------------------
 -- Ex 10: given a value and a tree, return a path that goes from the
@@ -213,4 +222,12 @@ set path val tree = todo
 --                    (Node 5 Empty Empty))                     ==>  Just [StepL,StepR]
 
 search :: Eq a => a -> Tree a -> Maybe [Step]
-search = todo
+-- search val tree = todo
+search _ Empty = Nothing -- base case
+search val (Node val' lTree rTree)
+  | val == val' = Just []
+  | otherwise = case search val lTree of
+      Just steps -> Just (StepL:steps) -- step upwards
+      Nothing -> case search val rTree of
+        Just steps -> Just (StepR:steps) -- step upwards
+        Nothing -> Nothing -- not found
