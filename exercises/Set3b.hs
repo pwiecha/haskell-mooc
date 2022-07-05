@@ -39,7 +39,7 @@ import Mooc.Todo
 --   buildList 7 0 3 ==> [3]
 
 buildList :: Int -> Int -> Int -> [Int]
-buildList _ 0 end = [end] -- end : []
+buildList _ 0 end = [end] -- end:[]
 buildList start count end = start : buildList start (count-1) end
 
 
@@ -84,7 +84,7 @@ mylast def [] = def
 -- mylast _ (x:[]) = x
 -- mylast def (x:xs) = mylast def xs
 -- can be boiled down to
-mylast _ (x:xs) = mylast x xs
+mylast _ (x:xs) = mylast x xs -- reuse def arg
 
 ------------------------------------------------------------------------------
 -- Ex 4: safe list indexing. Define a function indexDefault so that
@@ -141,8 +141,8 @@ sumsOf (x:xs) = x : sumsOfHelper xs x
 
 sumsOfHelper :: [Int] -> Int -> [Int] -- rolling sum
 sumsOfHelper [] _ = [] -- list exausted
-sumsOfHelper (x:xs) rolling_sum = new_sum : sumsOfHelper xs new_sum
-  where new_sum = x + rolling_sum
+sumsOfHelper (x:xs) sum = new_sum : sumsOfHelper xs new_sum
+  where new_sum = x + sum
 ------------------------------------------------------------------------------
 -- Ex 7: implement the function merge that merges two sorted lists of
 -- Ints into a sorted list
@@ -156,9 +156,9 @@ sumsOfHelper (x:xs) rolling_sum = new_sum : sumsOfHelper xs new_sum
 merge :: [Int] -> [Int] -> [Int]
 merge x [] = x
 merge [] y = y
-merge (x:xs) (y:ys) =
-  if x < y then x : merge xs (y:ys)
-  else y : merge (x:xs) ys
+merge (x:xs) (y:ys)
+  | x < y = x : merge xs (y:ys)
+  | otherwise = y : merge (x:xs) ys
 
 ------------------------------------------------------------------------------
 -- Ex 8: compute the biggest element, using a comparison function
@@ -183,6 +183,13 @@ merge (x:xs) (y:ys) =
 
 mymaximum :: (a -> a -> Bool) -> a -> [a] -> a
 mymaximum _ initial [] = initial
+mymaximum bigger initial (x:xs)
+    | bigger initial x = mymaximum bigger initial xs
+    | otherwise = mymaximum bigger x xs
+
+{--
+mymaximum :: (a -> a -> Bool) -> a -> [a] -> a
+mymaximum _ initial [] = initial
 mymaximum bigger initial (x:xs) = mymaximum bigger (takeBigger bigger initial x) xs
 -- or use guards and check if bigger x initial is True -> change initial to x
 
@@ -190,6 +197,7 @@ takeBigger :: (a -> a -> Bool) -> a -> a -> a
 takeBigger bigger x y
   | bigger x y = x
   | otherwise = y
+--}
 
 ------------------------------------------------------------------------------
 -- Ex 9: define a version of map that takes a two-argument function
@@ -204,7 +212,7 @@ takeBigger bigger x y
 
 map2 :: (a -> b -> c) -> [a] -> [b] -> [c]
 map2 f (a:as) (b:bs) = f a b : map2 f as bs
-map2 f _ _ = []
+map2 f _ _ = [] -- finish w/ empty list
 
 ------------------------------------------------------------------------------
 -- Ex 10: implement the function maybeMap, which works a bit like a
@@ -229,7 +237,6 @@ map2 f _ _ = []
 
 maybeMap :: (a -> Maybe b) -> [a] -> [b]
 maybeMap f [] = []
-maybeMap f (x:xs) =
-  case f x of
-    Just y -> y : maybeMap f xs
-    Nothing -> maybeMap f xs
+maybeMap f (x:xs) = case f x of
+  Just y -> y : maybeMap f xs
+  Nothing -> maybeMap f xs

@@ -77,11 +77,11 @@ fred = CreatePerson {name = "Fred", age = 90}
 
 -- getName returns the name of the person
 getName :: Person -> String
-getName p = name p
+getName = name
 
 -- getAge returns the age of the person
 getAge :: Person -> Int
-getAge p = age p
+getAge = age
 
 -- setName takes a person and returns a new person with the name changed
 setName :: String -> Person -> Person
@@ -115,11 +115,11 @@ getY (CreatePosition _ y) = y
 
 -- up increases the y value of a position by one
 up :: Position -> Position
-up pos = CreatePosition (getX pos) (getY pos + 1)
+up (CreatePosition x y) = CreatePosition x (y+1)
 
 -- right increases the x value of a position by one
 right :: Position -> Position
-right pos = CreatePosition (getX pos + 1) (getY pos)
+right (CreatePosition x y) = CreatePosition (x+1) y
 
 ------------------------------------------------------------------------------
 -- Ex 6: Here's a datatype that represents a student. A student can
@@ -134,11 +134,20 @@ data Student = Freshman | NthYear Int | Graduated
 -- graduated student stays graduated even if he studies.
 
 study :: Student -> Student
+study student = case student of
+  Freshman -> NthYear 1
+  NthYear 7 -> Graduated
+  NthYear x -> NthYear (x+1)
+  Graduated -> Graduated
+
+{--
+study :: Student -> Student
 study Freshman = NthYear 1
 study (NthYear year)
   | year < 7 = NthYear (year+1)
   | otherwise = Graduated
 study Graduated = Graduated
+--}
 
 
 ------------------------------------------------------------------------------
@@ -166,7 +175,7 @@ zero = UpCounter {value = 0}
 
 -- get returns the counter value
 get :: UpDown -> Int
-get ud = value ud
+get = value
 
 -- tick increases an increasing counter by one or decreases a
 -- decreasing counter by one
@@ -211,7 +220,7 @@ rgb :: Color -> [Double]
 rgb Red = [1,0,0]
 rgb Green = [0,1,0]
 rgb Blue = [0,0,1]
-rgb (Invert col) = map (1-) (rgb col)
+rgb (Invert col) = map (1-) $ rgb col
 rgb (Mix colOne colTwo) = zipWith avg (rgb colOne) (rgb colTwo)
   where avg a b = (a+b)/2
 {--

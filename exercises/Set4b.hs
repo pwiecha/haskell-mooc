@@ -19,12 +19,18 @@ import Mooc.Todo
 --   countNothings [Just 1, Nothing, Just 3, Nothing]  ==>  2
 
 countNothings :: [Maybe a] -> Int
-countNothings xs = foldr countHelper 0 xs
+countNothings = foldr countHelper 0
 
+countHelper :: Maybe a -> Int -> Int
+countHelper x y = case x of
+  Nothing -> y+1
+  Just _ -> y
+{--
 -- transform Nothing -> 1 Just _ -> 0
 -- foldr wiki helped with callback function arguments
 countHelper :: Maybe a -> Int -> Int
 countHelper currItem prevItem = prevItem + maybe 1 (const 0) currItem
+--}
 
 ------------------------------------------------------------------------------
 -- Ex 2: myMaximum with a fold. Just like in the previous exercise,
@@ -57,7 +63,7 @@ maxHelper currItem prevItem
 
 
 sumAndLength :: [Double] -> (Double, Int)
-sumAndLength xs = foldr slHelper slStart xs
+sumAndLength = foldr slHelper slStart
 
 slStart :: (Double, Int)
 slStart = (0.0, 0)
@@ -77,12 +83,18 @@ slHelper currItem (prevSum, prevLen) = (prevSum+currItem, prevLen+1)
 myConcat :: [[a]] -> [a]
 myConcat xs = foldr concatHelper concatStart xs
 
+concatStart :: [a]
 concatStart = []
 
+concatHelper :: [a] -> [a] -> [a]
+concatHelper = (++)
+
+{--
 concatHelper :: [a] -> [a] -> [a]
 concatHelper [] prevItem = prevItem -- list consumed
 concatHelper currItem prevItem = concatHelper (init currItem) (last currItem:prevItem) -- consume one element
 -- concatHelper can simply be (++) !!!
+--}
 
 ------------------------------------------------------------------------------
 -- Ex 5: get all occurrences of the largest number in a list with a

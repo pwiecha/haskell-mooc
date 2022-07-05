@@ -125,13 +125,20 @@ longest (x:xs) = longest' x xs
 -- Examples:
 --   incrementKey True [(True,1),(False,3),(True,4)] ==> [(True,2),(False,3),(True,5)]
 --   incrementKey 'a' [('a',3.4)] ==> [('a',4.4)]
+incrementKey :: (Eq k, Num v) => k -> [(k,v)] -> [(k,v)]
+incrementKey key = map increment
+    where increment (k,v)
+            | key == k = (k,v+1)
+            | otherwise = (k,v)
 
+{--
 incrementKey :: (Eq k, Num v) => k -> [(k,v)] -> [(k,v)]
 incrementKey _ [] = []
 incrementKey k (d:dict)
   | k == fst d = (k, snd d + 1) : incrementKey k dict -- increment
   | otherwise = d : incrementKey k dict -- pass
 -- map incr function also possible
+--}
 
 ------------------------------------------------------------------------------
 -- Ex 7: compute the average of a list of values of the Fractional
@@ -187,6 +194,14 @@ winner scores player1 player2
 --   freqs [False,False,False,True]
 --     ==> Map.fromList [(False,3),(True,1)]
 
+-- fold w/ countFreq function starting from empty map
+-- insertWith either updates existing value (+1) or creates new entry: 1
+-- eta reduce: freqs xs = ... xs -> freqs = ...
+freqs :: (Eq a, Ord a) => [a] -> Map.Map a Int
+freqs = foldr countFreq Map.empty
+    where countFreq elem mp = Map.insertWith (+) elem 1 mp
+
+{--
 freqs :: (Eq a, Ord a) => [a] -> Map.Map a Int
 freqs = Map.fromList . freqsLst
 
@@ -200,6 +215,7 @@ set (x:xs) = x : filter (/= x) (set xs)
 
 freqsLst :: (Eq a) => [a] -> [(a, Int)]
 freqsLst ks = [(k, countItem k ks) | k <- set ks]
+--}
 
 ------------------------------------------------------------------------------
 -- Ex 10: recall the withdraw example from the course material. Write a
@@ -228,6 +244,16 @@ freqsLst ks = [(k, countItem k ks) | k <- set ks]
 
 transfer :: String -> String -> Int -> Map.Map String Int -> Map.Map String Int
 transfer from to amount bank
+    | transferValid from amount bank && accountExist to bank = Map.adjust (+amount) to (Map.adjust (\x->x-amount) from bank)
+    | otherwise = bank
+    where
+        accountExist acc bank = Map.member acc bank
+        transferValid acc amount bank = amount > 0 && Map.findWithDefault 0 acc bank >= amount -- nonexistent accs has no money
+-- or use lookup function to find accounts and act on Just and do nothing otherwise
+
+{--
+transfer :: String -> String -> Int -> Map.Map String Int -> Map.Map String Int
+transfer from to amount bank
   | Map.member from bank && Map.member to bank =
     case Map.lookup from bank of
       Nothing -> bank
@@ -236,6 +262,7 @@ transfer from to amount bank
         then Map.adjust (+amount) to (Map.adjust (subtract amount) from bank)
         else bank
   | otherwise = bank
+--}
 ------------------------------------------------------------------------------
 -- Ex 11: given an Array and two indices, swap the elements in the indices.
 --
@@ -253,7 +280,11 @@ swap i j arr = arr // [(i, arr ! j), (j, arr ! i)]
 -- You may assume that the largest element is unique.
 --
 -- Hint: check out Data.Array.indices or Data.Array.assocs
+maxIndex :: (Ix i, Ord a) => Array i a -> i
+maxIndex arr = fst (foldr1 (\x y -> if snd x >= snd y then x else y) (Data.Array.assocs arr))
+-- or some maximum function?
 
+{--
 maxIndex :: (Ix i, Ord a) => Array i a -> i
 maxIndex arr = findLargest (head lst) (tail lst)
   where lst = assocs arr
@@ -263,3 +294,4 @@ findLargest (bi, _) [] = bi
 findLargest (bi, bv) ((i,v):xs)
   | bv > v = findLargest (bi, bv) xs
   | otherwise = findLargest (i, v) xs
+--}
