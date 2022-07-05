@@ -16,8 +16,8 @@ import Data.List
 -- Hint! pattern matching is your friend.
 
 binomial :: Integer -> Integer -> Integer
-binomial n 0 = 1
-binomial 0 k = 0
+binomial _ 0 = 1
+binomial 0 _ = 0
 binomial n k = binomial (n-1) k + binomial (n-1) (k-1)
 
 ------------------------------------------------------------------------------
@@ -27,6 +27,13 @@ binomial n k = binomial (n-1) k + binomial (n-1) (k-1)
 -- Examples:
 --   oddFactorial 7 ==> 7*5*3*1 ==> 105
 --   oddFactorial 6 ==> 5*3*1 ==> 15
+oddFactorial :: Integer -> Integer
+oddFactorial n
+    | n <= 0 = 1
+    | even n = oddFactorial (n-1)
+    | odd n = n * oddFactorial (n-2)
+
+{--
 oddFactorialHelper :: Integer -> Integer
 oddFactorialHelper n
     | n > 1 = n * oddFactorial (n-2)
@@ -36,6 +43,7 @@ oddFactorial :: Integer -> Integer
 oddFactorial n
     | odd n = oddFactorialHelper n
     | otherwise = oddFactorialHelper (n-1)
+--}
 
 ------------------------------------------------------------------------------
 -- Ex 3: implement the Euclidean Algorithm for finding the greatest
@@ -91,7 +99,11 @@ myGcd n k
 -- Tips:
 -- * you can combine strings with the ++ operator.
 -- * you can compute the length of a string with the length function
-
+leftpad :: String -> Int -> String
+leftpad s l
+    | length s >= l = s
+    | otherwise = leftpad (" " ++ s) l
+{--
 leftpad :: String -> Int -> String
 leftpad str newlen
     | newlen <= strlen = str
@@ -100,6 +112,7 @@ leftpad str newlen
     where
         strlen = length str
         space = " "
+--}
 
 ------------------------------------------------------------------------------
 -- Ex 5: let's make a countdown for a rocket! Given a number, you
@@ -166,7 +179,7 @@ smallestDivisorHelper n (x:xs)
 -- Ps. 0 and 1 are not prime numbers
 
 isPrime :: Integer -> Bool
-isPrime n = not (n <= 1) && smallestDivisor n == n
+isPrime n = n > 1 && smallestDivisor n == n
 
 ------------------------------------------------------------------------------
 -- Ex 8: implement a function biggestPrimeAtMost that returns the
@@ -182,5 +195,5 @@ isPrime n = not (n <= 1) && smallestDivisor n == n
 
 biggestPrimeAtMost :: Integer -> Integer
 biggestPrimeAtMost n
-    | n < 2 || isPrime n = n
+    | isPrime n = n
     | otherwise = biggestPrimeAtMost (n-1)

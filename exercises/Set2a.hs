@@ -52,7 +52,7 @@ takeFinal n xs = drop (length xs - n) xs
 --   updateAt 2 0 [4,5,6,7] ==>  [4,5,0,7]
 
 updateAt :: Int -> a -> [a] -> [a]
-updateAt i x xs = take i xs ++ [x] ++ drop (i + 1) xs
+updateAt i x xs = take i xs ++ [x] ++ drop (i+1) xs
 
 ------------------------------------------------------------------------------
 -- Ex 4: substring i j s should return the substring of s starting at
@@ -66,7 +66,7 @@ updateAt i x xs = take i xs ++ [x] ++ drop (i + 1) xs
 --   substring 0 4 "abcdefgh"  ==>  "abcd"
 
 substring :: Int -> Int -> String -> String
-substring i j s = drop i (take j s)
+substring i j s = drop i (take j s) -- take 1st to avoid subtraction
 
 ------------------------------------------------------------------------------
 -- Ex 5: check if a string is a palindrome. A palindrome is a string
@@ -190,5 +190,5 @@ addEithers (Left a) (Right b) = Left a
 addEithers (Left a) (Left b) = Left a
 --}
 addEithers (Right a) (Right b) = Right (a + b)
-addEithers (Right a) (Left b) = Left b
 addEithers (Left a) _ = Left a
+addEithers _ (Left b) = Left b

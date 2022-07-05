@@ -96,8 +96,8 @@ checkPassword password
 postagePrice :: Int -> Int
 postagePrice w
     | w <= 500 = 250
-    | w > 5000 = 6000
-    | otherwise = 300 + w
+    | w <= 5000 = 300 + w
+    | otherwise = 6000
 
 ------------------------------------------------------------------------------
 -- Ex 8: define a function isZero that returns True if it is given an
@@ -107,7 +107,9 @@ postagePrice w
 --
 -- Ps. remember, the type of booleans in haskell is Bool
 isZero :: Integer -> Bool
-isZero n = if n == 0 then True else False 
+isZero 0 = True
+isZero _ = False
+
 
 ------------------------------------------------------------------------------
 -- Ex 9: implement using recursion a function sumTo such that
@@ -123,7 +125,7 @@ sumTo n = n + sumTo (n-1)
 -- Use recursion.
 
 power :: Integer -> Integer -> Integer
-power _ 0 = 1
+power _ 0 = 1 -- base case (end of recursion)
 power n k = n * power n (k-1)
 {- note: power n k-1 in recursive call produces infinite loop
    because function call takes precedence over subtraction
@@ -147,6 +149,5 @@ power n k = n * power n (k-1)
 --   ilog3 7 ==> 2
 
 ilog3 :: Integer -> Integer
-ilog3 n 
-    | n < 3 = 1
-    | otherwise = 1 + ilog3 (n `div` 3)
+ilog3 0 = 0
+ilog3 n = 1 + ilog3 (n`div`3)

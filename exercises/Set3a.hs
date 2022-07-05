@@ -43,7 +43,7 @@ maxBy measure a b
 
 mapMaybe :: (a -> b) -> Maybe a -> Maybe b
 mapMaybe _ Nothing  = Nothing
-mapMaybe f (Just x) = Just (f x)
+mapMaybe f (Just x) = Just $ f x
 
 ------------------------------------------------------------------------------
 -- Ex 3: implement the function mapMaybe2 that works like mapMaybe
@@ -64,7 +64,7 @@ mapMaybe2 f (Just x) (Just y) = Just (f x y)
 -}
 -- we only care about result when both Just values are supplied
 mapMaybe2 :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
-mapMaybe2 f (Just x) (Just y) = Just (f x y)
+mapMaybe2 f (Just x) (Just y) = Just $ f x y
 mapMaybe2 _ _ _ = Nothing
 
 ------------------------------------------------------------------------------
@@ -126,11 +126,11 @@ capitalize :: String -> String
 -- composition f.g x = f(f(x)) where x would be a single argument
 -- capitalize str = (unwords . map capitalizeFirst) (words str)
 -- $ has lowest precedence so . binds unwords and map capitalizeFirst and words binds str
-capitalize str = unwords . map capitalizeFirst $ words str
-
-capitalizeFirst :: String -> String
-capitalizeFirst str = toUpper (head str) : tail str
--- or capitalizeFirst (h:t) = toUpper h : t
+capitalize str = unwords . map capitalizeFirst . words $ str
+  where
+    capitalizeFirst :: String -> String
+    capitalizeFirst str = toUpper (head str) : tail str
+    -- or capitalizeFirst (h:t) = toUpper h : t
 
 ------------------------------------------------------------------------------
 -- Ex 6: powers k max should return all the powers of k that are less
@@ -156,6 +156,7 @@ powers :: Int -> Int -> [Int]
 -- > powers k max = takeWhile (<=max) $ map (k^) [0..max]
 -- using iterate to avoid creating longer than needed list, k, k*k, k*k*k...
 powers k max = takeWhile (<=max) $ iterate (k*) 1
+-- or: powers k max = takeWhile (<=max) [k^i | i <- [0..max]]-
 
 ------------------------------------------------------------------------------
 -- Ex 7: implement a functional while loop. While should be a function
@@ -233,6 +234,7 @@ joinToLength strlen strlst =
   length (i ++ j) == strlen -- filter output
   ]
 -- or write filter as: let k = i ++ j, length k == strlen
+-- joinToLength l slst = filter ((==l). length)  [a ++ b | a <- slst, b <- slst]
 
 ------------------------------------------------------------------------------
 -- Ex 10: implement the operator +|+ that returns a list with the first
@@ -277,7 +279,7 @@ xs +|+ ys = take 1 xs ++ take 1 ys
 
 -- sum(Left -> 0, Right x -> x)
 sumRights :: [Either a Int] -> Int
-sumRights lst = sum . map (either (const 0) id) $ lst
+sumRights = sum . map (either (const 0) id)
 
 ------------------------------------------------------------------------------
 -- Ex 12: recall the binary function composition operation
@@ -293,12 +295,17 @@ sumRights lst = sum . map (either (const 0) id) $ lst
 --   multiCompose [(3*), (2^), (+1)] 0 ==> 6
 --   multiCompose [(+1), (2^), (3*)] 0 ==> 2
 
-multiCompose fs x = mcf x
-  where mcf = foldr (.) id fs 
-  -- ^ id is the default function applied if no other were supplied (empty list)
+multiCompose :: [a->a] -> a -> a
+multiCompose fs = mcf
+  where mcf = foldr (.) id fs
+  -- id is the def function applied (when list is empty)
 
 -- else take last function, apply it to argument and take next?
 -- (init fs) (last fs x)
+
+-- or straightforward
+-- multiCompose [] arg = arg
+-- multiCompose (f:fs) arg = f (multiCompose fs arg)
 
 ------------------------------------------------------------------------------
 -- Ex 13: let's consider another way to compose multiple functions. Given
@@ -361,13 +368,13 @@ interpreter commands = interpreterHelper commands 0 0
 
 interpreterHelper :: [String] -> Int -> Int -> [String]
 interpreterHelper [] x y = []
-interpreterHelper (command:commands) x y
-  | command == "up" = interpreterHelper commands x (y+1)
-  | command == "down" = interpreterHelper commands x (y-1)
-  | command == "left" = interpreterHelper commands (x-1) y
-  | command == "right" = interpreterHelper commands (x+1) y
-  | command == "printX" = show x : interpreterHelper commands x y
-  | otherwise = show y : interpreterHelper commands x y
+interpreterHelper (c:cs) x y = case c of
+  "up" -> interpreterHelper cs x (y+1)
+  "down" -> interpreterHelper cs x (y-1)
+  "left" -> interpreterHelper cs (x-1) y
+  "right" -> interpreterHelper cs (x+1) y
+  "printX" -> show x : interpreterHelper cs x y
+  _ -> show y : interpreterHelper cs x y
 -- or add case for printY and default to some "ERROR"
 
 
