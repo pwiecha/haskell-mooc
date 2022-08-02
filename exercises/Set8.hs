@@ -13,6 +13,7 @@ import Mooc.Todo
 -- We'll use the JuicyPixels library to generate images. The library
 -- exposes the Codec.Picture module that has everything we need.
 import Codec.Picture
+import Text.XHtml (h1)
 
 -- Let's start by defining Colors and Pictures.
 
@@ -133,7 +134,10 @@ renderListExample = renderList justADot (9,11) (9,11)
 --      ["000000","000000","000000"]]
 
 dotAndLine :: Picture
-dotAndLine = todo
+dotAndLine = Picture f
+  where f (Coord 3 4) = white
+        f (Coord _ 8) = pink
+        f _ = black
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
@@ -166,10 +170,13 @@ dotAndLine = todo
 --          ["7f0000","7f0000","7f0000"]]
 
 blendColor :: Color -> Color -> Color
-blendColor = todo
+blendColor (Color r1 g1 b1) (Color r2 g2 b2) = Color (avg r1 r2) (avg g1 g2) (avg b1 b2)
+  where avg a b = (a+b) `div` 2
 
 combine :: (Color -> Color -> Color) -> Picture -> Picture -> Picture
-combine = todo
+combine combineF (Picture picConstructor) (Picture picConstructor') = Picture newPicConstructor
+  -- new pic constructor definition for any pixel -> get pixels from pictures and combine them
+  where newPicConstructor coordinates = combineF (picConstructor coordinates) (picConstructor' coordinates)
 
 ------------------------------------------------------------------------------
 
@@ -230,7 +237,9 @@ exampleCircle = fill red (circle 80 100 200)
 --        ["000000","000000","000000","000000","000000","000000"]]
 
 rectangle :: Int -> Int -> Int -> Int -> Shape
-rectangle x0 y0 w h = todo
+rectangle x0 y0 w h = Shape f
+  where f (Coord x y) = inRange x x0 (x0+w-1) && inRange y y0 (y0+h-1)
+        inRange p p0 p1 = p <= p1 && p >= p0
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
@@ -246,10 +255,12 @@ rectangle x0 y0 w h = todo
 -- shape.
 
 union :: Shape -> Shape -> Shape
-union = todo
+union (Shape f) (Shape g) = Shape h
+  where h coordinates = f coordinates || g coordinates
 
 cut :: Shape -> Shape -> Shape
-cut = todo
+cut (Shape f) (Shape g) = Shape h
+  where h coordinates = f coordinates && not (g coordinates)
 ------------------------------------------------------------------------------
 
 -- Here's a snowman, built using union from circles and rectangles.
@@ -277,7 +288,9 @@ exampleSnowman = fill white snowman
 --        ["000000","000000","000000"]]
 
 paintSolid :: Color -> Shape -> Picture -> Picture
-paintSolid color shape base = todo
+paintSolid color (Shape s) (Picture b) = Picture f
+  where f coordinates | s coordinates = color -- if pixel inside new shape - use new paint
+                      | otherwise = b coordinates -- otherwise use old paint
 ------------------------------------------------------------------------------
 
 allWhite :: Picture
@@ -322,7 +335,9 @@ stripes a b = Picture f
 --       ["000000","000000","000000","000000","000000"]]
 
 paint :: Picture -> Shape -> Picture -> Picture
-paint pat shape base = todo
+paint (Picture patternF) (Shape shapeF) (Picture picBaseF) = Picture f
+  where f coordinates | shapeF coordinates = patternF coordinates -- if pixel in shape -> paint according to pattern
+                      | otherwise = picBaseF coordinates
 ------------------------------------------------------------------------------
 
 -- Here's a patterned version of the snowman example. See it by running:
@@ -385,19 +400,26 @@ xy = Picture f
 data Fill = Fill Color
 
 instance Transform Fill where
-  apply = todo
+  apply (Fill col) (Picture f) = Picture g
+    where g (Coord _ _) = col
 
 data Zoom = Zoom Int
   deriving Show
 
 instance Transform Zoom where
-  apply = todo
+  apply (Zoom factor) (Picture f) = Picture g
+    where g (Coord x y) = f (Coord (x `div` factor) (y `div` factor))
 
 data Flip = FlipX | FlipY | FlipXY
   deriving Show
 
 instance Transform Flip where
-  apply = todo
+  apply FlipX (Picture f) = Picture g
+    where g (Coord x y) = f (Coord (-x) y)
+  apply FlipY (Picture f) = Picture g
+    where g (Coord x y) = f (Coord x (-y))
+  apply FlipXY (Picture f) = Picture g
+    where g (Coord x y) = f (Coord y x)
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
@@ -412,8 +434,8 @@ instance Transform Flip where
 data Chain a b = Chain a b
   deriving Show
 
-instance Transform (Chain a b) where
-  apply = todo
+instance (Transform a, Transform b) => Transform (Chain a b) where
+  apply (Chain a b) = apply a . apply b
 ------------------------------------------------------------------------------
 
 -- Now we can redefine largeVerticalStripes using the above Transforms.
@@ -451,7 +473,17 @@ data Blur = Blur
   deriving Show
 
 instance Transform Blur where
-  apply = todo
+  apply Blur (Picture f) = Picture g
+    where g (Coord x y) = blurAtCoord f (Coord x y)
+          getColor :: (Coord -> Color) -> Coord -> Color
+          getColor p (Coord x y) = p (Coord x y)
+          blurColors :: Color -> Color -> Color -> Color -> Color -> Color
+          blurColors (Color r0 g0 b0) (Color r1 g1 b1) (Color r2 g2 b2) (Color r3 g3 b3) (Color r4 g4 b4) =
+            Color (blur r0 r1 r2 r3 r4) (blur g0 g1 g2 g3 g4) (blur b0 b1 b2 b3 b4)
+              where blur a b c d e = (a+b+c+d+e) `div` 5
+          blurAtCoord :: (Coord -> Color) -> Coord -> Color
+          blurAtCoord p (Coord x y) = blurColors (getColor p (Coord x y)) (getColor p (Coord (x+1) y)) (getColor p (Coord (x-1) y)) (getColor p (Coord x (y+1))) (getColor p (Coord x (y-1)))
+
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
@@ -469,7 +501,9 @@ data BlurMany = BlurMany Int
   deriving Show
 
 instance Transform BlurMany where
-  apply = todo
+  apply (BlurMany n) (Picture p)
+    | n == 1 = apply Blur (Picture p)
+    | otherwise = apply (BlurMany (n-1)) (apply Blur (Picture p))
 ------------------------------------------------------------------------------
 
 -- Here's a blurred version of our original snowman. See it by running
