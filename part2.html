@@ -2735,7 +2735,7 @@ this topic connects to equational reasoning discussed in chapter 10.
 <div class="sourceCode" id="cb214"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb214-1"><a href="#cb214-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Python</span></span>
 <span id="cb214-2"><a href="#cb214-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> op(val)</span>
 <span id="cb214-3"><a href="#cb214-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> x:</span>
-<span id="cb214-4"><a href="#cb214-4" aria-hidden="true" tabindex="-1"></a>  f x</span></code></pre></div>
+<span id="cb214-4"><a href="#cb214-4" aria-hidden="true" tabindex="-1"></a>  f(x)</span></code></pre></div>
 <div class="sourceCode" id="cb215"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb215-1"><a href="#cb215-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Java</span></span>
 <span id="cb215-2"><a href="#cb215-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Object</span> x <span class="op">=</span> <span class="fu">op</span><span class="op">(</span>val<span class="op">);</span></span>
 <span id="cb215-3"><a href="#cb215-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>x <span class="op">!=</span> <span class="kw">null</span><span class="op">)</span> <span class="op">{</span></span>
@@ -3625,7 +3625,7 @@ None of the above
 <span id="cb316-3"><a href="#cb316-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span> <span class="dt">T</span><span class="op">&gt;</span> <span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Text.Lazy</span> <span class="kw">as</span> <span class="dt">TL</span></span>
 <span id="cb316-4"><a href="#cb316-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span> <span class="dt">T</span> <span class="dt">TL</span><span class="op">&gt;</span> TL.head (TL.pack (<span class="fu">repeat</span> <span class="ch">&#39;x&#39;</span>))</span>
 <span id="cb316-5"><a href="#cb316-5" aria-hidden="true" tabindex="-1"></a><span class="ch">&#39;x&#39;</span></span></code></pre></div>
-<p>Another practical problem that sometimes crops is that you can end up with a mismatch between strict and lazy <code>Text</code>s when using libraries. You can usually fix this by using <code>toStrict</code> or <code>fromStrict</code> as needed.</p>
+<p>Another practical problem is that you can end up with a mismatch between strict and lazy <code>Text</code>s when using libraries. You can usually fix this by using <code>toStrict</code> or <code>fromStrict</code> as needed.</p>
 <div class="sourceCode" id="cb317"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb317-1"><a href="#cb317-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span> <span class="dt">T</span> <span class="dt">TL</span><span class="op">&gt;</span> lazyPhrase <span class="ot">=</span> TL.pack <span class="st">&quot;brevity is the soul of wit&quot;</span></span>
 <span id="cb317-2"><a href="#cb317-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Prelude</span> <span class="dt">T</span> <span class="dt">TL</span><span class="op">&gt;</span> <span class="op">:</span>t lazyPhrase</span>
 <span id="cb317-3"><a href="#cb317-3" aria-hidden="true" tabindex="-1"></a><span class="ot">lazyPhrase ::</span> <span class="dt">TL.Text</span></span>

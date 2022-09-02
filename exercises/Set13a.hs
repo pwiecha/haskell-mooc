@@ -28,7 +28,7 @@ import Examples.Bank
 
 (?>) :: Maybe a -> (a -> Maybe b) -> Maybe b
 Nothing ?> _ = Nothing   -- In case of failure, propagate failure
-Just x  ?> f = f x       -- In case of sucess, run the next computation
+Just x  ?> f = f x       -- In case of success, run the next computation
 
 -- DO NOT touch this definition!
 readNames :: String -> Maybe (String,String)
@@ -198,11 +198,11 @@ update = todo
 -- should work.
 --
 -- Examples:
---   runState (paren '(') 3    ==> (4,())
---   runState (paren ')') 3    ==> (2,())
---   runState (paren ')') 0    ==> (-1,())
---   runState (paren ')') (-1) ==> (-1,())
---   runState (paren '(') (-1) ==> (-1,())
+--   runState (paren '(') 3    ==> ((),4)
+--   runState (paren ')') 3    ==> ((),2)
+--   runState (paren ')') 0    ==> ((),-1)
+--   runState (paren ')') (-1) ==> ((),-1)
+--   runState (paren '(') (-1) ==> ((),-1)
 --   parensMatch "()"          ==> True
 --   parensMatch "("           ==> False
 --   parensMatch "())"         ==> False
