@@ -22,7 +22,8 @@ import Mooc.Todo
 --   False ||| undefined ==> an error!
 
 (|||) :: Bool -> Bool -> Bool
-x ||| y = todo
+_ ||| True = True
+x ||| _ = x
 
 ------------------------------------------------------------------------------
 -- Ex 2: Define the function boolLength, that returns the length of a
@@ -35,8 +36,16 @@ x ||| y = todo
 -- Note that with the ordinary length function,
 --   length [False,undefined] ==> 2
 
+-- note to self, undefined :: a, so has a Bool type here
 boolLength :: [Bool] -> Int
-boolLength xs = todo
+boolLength [] = 0
+boolLength (x:xs) = increment x + boolLength xs where
+  -- force evaluation by using this simple function to catch undefined
+  increment :: Bool -> Int
+  increment x = case x of
+    True -> 1
+    False -> 1
+-- or pattern match for True and False separately, e.g. (True:xs)
 
 ------------------------------------------------------------------------------
 -- Ex 3: Define the function validate which, given a predicate and a
@@ -50,7 +59,9 @@ boolLength xs = todo
 --   validate (\x -> undefined) 3  ==>  an error!
 
 validate :: (a -> Bool) -> a -> a
-validate predicate value = todo
+validate predicate value = case predicate value of
+  True -> value
+  False -> value
 
 ------------------------------------------------------------------------------
 -- Ex 4: Even though we can't implement the generic seq function
@@ -84,10 +95,14 @@ class MySeq a where
   myseq :: a -> b -> b
 
 instance MySeq Bool where
-  myseq = todo
+  myseq a b = case a of
+    True -> b
+    _ -> b
 
 instance MySeq Int where
-  myseq = todo
+  myseq 0 b = b
+  myseq _ b = b
 
 instance MySeq [a] where
-  myseq = todo
+  myseq [] b = b -- will force evaluation of lst
+  myseq _ b = b

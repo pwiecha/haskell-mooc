@@ -42,6 +42,7 @@ interleave :: [a] -> [a] -> [a]
 interleave xs [] = xs
 interleave [] ys = ys
 interleave (x:xs) (y:ys) = x:y:interleave xs ys
+-- or swap arguments to shorten
 
 ------------------------------------------------------------------------------
 -- Ex 3: Deal out cards. Given a list of players (strings), and a list
@@ -103,7 +104,7 @@ alternate :: [a] -> [a] -> a -> [a]
 --alternate xs ys z = xs++[z]++ys++[z]++alternate xs ys z
 --alternate _ _ _ = []
 alternate xs ys z = cycle $ xs++[z]++ys++[z]
-
+-- note: swap arguments, new trick!
 ------------------------------------------------------------------------------
 -- Ex 6: Check if the length of a list is at least n. Make sure your
 -- function works for infinite inputs.
@@ -114,7 +115,7 @@ alternate xs ys z = cycle $ xs++[z]++ys++[z]
 --   lengthAtLeast 10 [0..]  ==> True
 
 lengthAtLeast :: Int -> [a] -> Bool
-lengthAtLeast n lst = length (take n lst) >= n
+lengthAtLeast n lst = length (take n lst) == n
 
 ------------------------------------------------------------------------------
 -- Ex 7: The function chunks should take in a list, and a number n,
@@ -151,13 +152,15 @@ chunks n (e:es)
 --   ignorecase "abC" == ignorecase "ABc"  ==>  True
 --   ignorecase "acC" == ignorecase "ABc"  ==>  False
 
-newtype IgnoreCase = CIString String
+newtype IgnoreCase = IgnoreCase String
 
 instance Eq IgnoreCase where
-  CIString x == CIString y = map toLower x == map toLower y
+  IgnoreCase x == IgnoreCase y = map toLower x == map toLower y
 
 ignorecase :: String -> IgnoreCase
-ignorecase = CIString
+ignorecase = IgnoreCase
+
+-- note: naming single constructor same as adt
 
 ------------------------------------------------------------------------------
 -- Ex 9: Here's the Room type and some helper functions from the
