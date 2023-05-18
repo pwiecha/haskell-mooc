@@ -1536,7 +1536,7 @@ lectureParticipants = [Right 10, Right 13, Left &quot;easter vacation&quot;, Rig
 <span id="cb136-4"><a href="#cb136-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> n <span class="op">==</span> <span class="dv">5</span> <span class="ot">=</span> <span class="st">&quot;You&#39;re one day closer to weekend!&quot;</span></span>
 <span id="cb136-5"><a href="#cb136-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> n <span class="op">&gt;</span> <span class="dv">1</span> <span class="ot">=</span> <span class="fu">show</span> (n <span class="op">-</span> <span class="dv">1</span>) <span class="op">++</span> <span class="st">&quot; more day(s) until the weekend!&quot;</span></span>
 <span id="cb136-6"><a href="#cb136-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="st">&quot;Relax! You don&#39;t need to work today!&quot;</span></span>
-<span id="cb136-7"><a href="#cb136-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> n <span class="ot">=</span> distanceToSunday day <span class="op">-</span> <span class="dv">1</span></span></code></pre></div>
+<span id="cb136-7"><a href="#cb136-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> n <span class="ot">=</span> distanceToSunday day</span></code></pre></div>
 <p>We’ll see in a moment how we can define <code>distanceToSunday</code> using equations and <code>case</code> expressions.</p>
 <p>Secondly, if a helper function needs to be shared among many patterns, then equations don’t work. For example:</p>
 <div class="sourceCode" id="cb137"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="ot">area ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Double</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></span>
@@ -2367,13 +2367,13 @@ unspecified
 <li>
 unspecified
 </li>
-<li class="correct">
+<li>
 <code>(c -&gt; a -&gt; b) -&gt; a</code>
 </li>
 <li class="correct">
 <code>c -&gt; (a -&gt; b -&gt; a)</code>
 </li>
-<li class="correct">
+<li>
 <code>a -&gt; b -&gt; c -&gt; a</code>
 </li>
 </ol>
@@ -3557,7 +3557,7 @@ Because <code>Nothing</code> is a constructor.
 <span id="cb400-5"><a href="#cb400-5" aria-hidden="true" tabindex="-1"></a>  check x <span class="ot">=</span> x <span class="op">&gt;</span> <span class="dv">0</span></span></code></pre></div>
 <p>Now we can write a function that checks a list. We use the standard library function <code>and :: [Bool] -&gt; Bool</code> that checks if a list is all <code>True</code>s.</p>
 <div class="sourceCode" id="cb401"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb401-1"><a href="#cb401-1" aria-hidden="true" tabindex="-1"></a><span class="ot">checkAll ::</span> <span class="dt">Check</span> a <span class="ot">=&gt;</span> [a] <span class="ot">-&gt;</span> <span class="dt">Bool</span></span>
-<span id="cb401-2"><a href="#cb401-2" aria-hidden="true" tabindex="-1"></a>checkAll <span class="ot">=</span> <span class="fu">and</span> (<span class="fu">map</span> check xs)</span></code></pre></div>
+<span id="cb401-2"><a href="#cb401-2" aria-hidden="true" tabindex="-1"></a>checkAll xs <span class="ot">=</span> <span class="fu">and</span> (<span class="fu">map</span> check xs)</span></code></pre></div>
 <p>In order to turn this into a <code>Check [a]</code> instance, we need to add a constraint to the instance declaration. Our <code>Check [a]</code> is based on the <code>Check a</code> instance.</p>
 <div class="sourceCode" id="cb402"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb402-1"><a href="#cb402-1" aria-hidden="true" tabindex="-1"></a><span class="kw">instance</span> <span class="dt">Check</span> a <span class="ot">=&gt;</span> <span class="dt">Check</span> [a] <span class="kw">where</span></span>
 <span id="cb402-2"><a href="#cb402-2" aria-hidden="true" tabindex="-1"></a>  check xs <span class="ot">=</span> <span class="fu">and</span> (<span class="fu">map</span> check xs)</span></code></pre></div>
